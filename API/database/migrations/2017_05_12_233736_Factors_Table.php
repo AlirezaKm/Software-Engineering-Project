@@ -13,6 +13,13 @@ class FactorsTable extends Migration
      */
     public function up()
     {
+        Schema::create('Sellers', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->softDeletes();
+            # Foreign Keys
+        });
+
         Schema::create('Factors', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('seller');
@@ -20,7 +27,7 @@ class FactorsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             # Foreign Keys
-            $table->foreign('seller')->references('id')->on('Users');
+            $table->foreign('seller')->references('id')->on('Sellers');
         });
     }
 
@@ -32,5 +39,6 @@ class FactorsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('Factors');
+        Schema::dropIfExists('Sellers');
     }
 }

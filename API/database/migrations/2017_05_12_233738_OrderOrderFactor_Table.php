@@ -16,7 +16,7 @@ class OrderOrderFactorTable extends Migration
         Schema::create('Order', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('product');
-            $table->unsignedInteger('count');
+            $table->unsignedInteger('count')->default(0);
             $table->unsignedInteger('orderFactor');
             $table->timestamps();
             $table->softDeletes();
