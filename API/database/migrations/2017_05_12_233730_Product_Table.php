@@ -14,7 +14,7 @@ class ProductTable extends Migration
     public function up()
     {
         Schema::create('Product', function (Blueprint $table) {
-            $table->primary('code');
+            $table->unsignedInteger('code');
             $table->unsignedInteger('factor');
             $table->string('name');
             $table->unsignedInteger('category');
@@ -26,7 +26,8 @@ class ProductTable extends Migration
             $table->softDeletes();
 
             # Foreign Keys
-            $table->foreign('factor')->references('id')->on('factors');
+            $table->primary('code');
+            $table->foreign('factor')->references('id')->on('Factors');
             $table->foreign('category')->references('id')->on('Category');
             $table->foreign('subcategory')->references('id')->on('SubCategory');
         });

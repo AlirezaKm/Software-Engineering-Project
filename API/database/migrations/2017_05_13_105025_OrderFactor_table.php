@@ -17,7 +17,6 @@ class OrderFactorTable extends Migration
         Schema::create('OrderStatus', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -26,9 +25,9 @@ class OrderFactorTable extends Migration
             ['name' => 'Cancelled']
         ]);
 
-        Schema::table('OrderFactor', function (Blueprint $table) {
+        Schema::create('OrderFactor', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('status')->default(DB::table('OrderStatus')->select('name','Cancelled')->get()->id);
+            $table->unsignedInteger('status')->default(DB::table('OrderStatus')->where('name','Cancelled')->first()->id);
             $table->unsignedInteger('count')->default(0);
             $table->double('sum')->default(0);
             $table->timestamps();
