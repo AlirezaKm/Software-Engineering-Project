@@ -7,7 +7,7 @@ use App\Http\Requests\API\UpdateOrderFactorAPIRequest;
 use App\Models\OrderFactor;
 use App\Repositories\OrderFactorRepository;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AppBaseController;
+use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateSellersRequest;
 use App\Http\Requests\UpdateSellersRequest;
 use App\Repositories\SellersRepository;
-use App\Http\Controllers\AppBaseController;
+use InfyOm\Generator\Controller\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;

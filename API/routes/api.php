@@ -18,28 +18,28 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::resource('user_types', 'UserTypeAPIController');
+Route::resource('user_types', 'API\UserTypeAPIController');
 
-Route::resource('users', 'UserAPIController');
+Route::resource('users', 'API\UserAPIController');
 
-Route::resource('products', 'ProductAPIController');
+Route::resource('products', 'API\ProductAPIController');
 
-Route::resource('categories', 'CategoryAPIController');
+Route::resource('categories', 'API\CategoryAPIController');
 
-Route::resource('sub_categories', 'SubCategoryAPIController');
+Route::resource('sub_categories', 'API\SubCategoryAPIController');
 
-Route::resource('properties', 'PropertyAPIController');
+Route::resource('properties', 'API\PropertyAPIController');
 
-Route::resource('product_properties', 'ProductPropertyAPIController');
+Route::resource('product_properties', 'API\ProductPropertyAPIController');
 
-Route::resource('expenses', 'ExpenseAPIController');
+Route::resource('expenses', 'API\ExpenseAPIController');
 
-Route::resource('factors', 'FactorsAPIController');
+Route::resource('factors', 'API\FactorsAPIController');
 
-Route::resource('orders', 'OrderAPIController');
+Route::resource('orders', 'API\OrderAPIController');
 
-Route::resource('order_statuses', 'OrderStatusAPIController');
+Route::resource('order_statuses', 'API\OrderStatusAPIController');
 
-Route::resource('sellers', 'SellersAPIController');
+Route::resource('sellers', 'API\SellersAPIController');
 
-Route::resource('order_factors', 'OrderFactorAPIController');
+Route::resource('order_factors', 'API\OrderFactorAPIController');

@@ -7,7 +7,7 @@ use App\Http\Requests\API\UpdateProductPropertyAPIRequest;
 use App\Models\ProductProperty;
 use App\Repositories\ProductPropertyRepository;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AppBaseController;
+use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
