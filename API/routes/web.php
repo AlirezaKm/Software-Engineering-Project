@@ -14,3 +14,30 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::resource('userTypes', 'UserTypeController');
+
+Route::resource('users', 'UserController');
+
+Route::resource('products', 'ProductController');
+
+Route::resource('categories', 'CategoryController');
+
+Route::resource('subCategories', 'SubCategoryController');
+
+Route::resource('properties', 'PropertyController');
+
+Route::resource('productProperties', 'ProductPropertyController');
+
+Route::resource('expenses', 'ExpenseController');
+
+Route::resource('factors', 'FactorsController');
+
+Route::resource('orders', 'OrderController');
+
+Route::resource('orderStatuses', 'OrderStatusController');
+
+Route::resource('sellers', 'SellersController');
+
+Route::resource('orderFactors', 'OrderFactorController');
