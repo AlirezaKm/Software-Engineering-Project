@@ -14,8 +14,8 @@ class shopinoDB{
   getObjects(ObjectName){
     return shopinoDB.realm.objects(ObjectName);
   }
-  max(array,field){
-    const sorted = this.getObjects('Category').sorted('id');
+  max(ObjectName,field){
+    const sorted = this.getObjects(ObjectName).sorted(field);
     return sorted.length > 0 ?
         sorted[sorted.length-1][field] : 0;
   }
@@ -25,7 +25,7 @@ class shopinoDB{
     })
   }
   addObject(ObjectName,primaryKey,info){
-    const max = this.max(this.getObjects(ObjectName),primaryKey);
+    const max = this.max(ObjectName,primaryKey);
 
     let args = {};
     args[primaryKey] = max + 1;
