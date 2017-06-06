@@ -10,10 +10,14 @@ import {AppRegistry,I18nManager} from 'react-native';
 import App from './components/App'
 import store from './store'
 import SQLite from 'react-native-sqlite-storage'
-import db from './db'
+import shopinoDB from './db'
 
-console.log('Realm Path: ',db.defaultPath());
-
+const mydb = new shopinoDB();
+//mydb.addProduct();
+const categories=mydb.getObjects('Category');
+console.log(categories);
+mydb.addCategory({name:'cloth'});
+console.log(categories);
 I18nManager.forceRTL(true);
 
 const shopino = ()=>{  

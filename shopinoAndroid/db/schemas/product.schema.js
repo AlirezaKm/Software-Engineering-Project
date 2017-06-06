@@ -1,8 +1,14 @@
+
+class Product{
+    getName(){
+        return this.name;
+    }
+}
 var productSchema=
 {
     name:'Product',
     properties:{
-        code:{type:'string',primaryKey:true},
+        code:{type:'int',primaryKey:true},
         category:{type:'Category'},
         subCategory:{type:'SubCategory'},
         count:'int',
@@ -12,5 +18,6 @@ var productSchema=
         created_at:{type:'date',default:Date.now()}
     }
 }
+Product.schema = productSchema;
 
-export default productSchema
+export default Product;

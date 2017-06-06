@@ -1,7 +1,8 @@
 var typeSchema = {
     name:'Type',
     properties:{
-        name:{type:'string',primaryKey:true}
+        id:{type:'int',primaryKey:true},
+        name:{type:'string'}
     }
 }
 export default typeSchema

@@ -2,6 +2,7 @@ var userSchema=
 {
     name:'User',
     properties:{
+        id:{type:'int'},
         username:{type:'string',primaryKey:true},
         fname:'string',
         lname:'string',

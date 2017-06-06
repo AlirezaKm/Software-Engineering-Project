@@ -1,8 +1,17 @@
+class Category{
+    getName(){
+        return this.name;
+    }
+}
+
 var categorySchema=
 {
     name:'Category',
     properties:{
-        name:{type:'string',primaryKey:true}
+        id:{type:'int',primaryKey:true},
+        name:{type:'string'}
     } 
 }
-export default categorySchema
+Category.schema = categorySchema;
+
+export default Category

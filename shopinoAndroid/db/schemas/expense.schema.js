@@ -2,7 +2,7 @@ var expenseSchema=
 {
     name:'Expense',
     properties:{
-        code:{type:'string',primaryKey:true},
+        id:{type:'int',primaryKey:true},
         title:'string',
         price:'float',
         created_at:{type:'date',default:Date.now()}

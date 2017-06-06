@@ -11,7 +11,7 @@ import typeSchema from './type.schema'
 import userSchema from './user.schema'
 import expenseSchema from './expense.schema'
 
-export {
+const schemas = {
     categorySchema,
     subCategorySchema,
     propertySchema ,
@@ -25,7 +25,11 @@ export {
     userSchema ,
     expenseSchema 
 }
-/*export default{
-    categorySchema,
-    subCategorySchema
-}*/
+var schemasArray =[];
+    //console.log('schemas: ');
+    //convert schemas Objects to Array of schemas
+for(schemaName in schemas){
+      //console.log('    '+schemaName);
+    schemasArray.push(schemas[schemaName]);
+}
+export default schemasArray;
