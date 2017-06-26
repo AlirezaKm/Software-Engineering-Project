@@ -1,7 +1,7 @@
 import React,{Component} from 'react'
 import {Container,Content,Fab,Icon,Spinner} from 'native-base'
 import {connect} from 'react-redux'
-import {Text,CardRow} from '../common'
+import {Text,CardRow,Load} from '../common'
 import {colors} from '../styles'
 import {loadUsers} from '../../actions/Users'
 //import SQLite from 'react-native-sqlite-storage'
@@ -15,14 +15,19 @@ class Users extends Component{
         /*this.state={
             message:''
         }*/
+        console.log('Users.constructor');
     }
-    componentWillMount(){
-
-    }
-    componentDidMount(){
+    load(){
         const {loadUsersInfo} = this.props;
         loadUsersInfo();
-        console.log('users component did mount');
+    }
+    componentWillMount(){
+        this.load();
+        console.log('Users.componentWillMount');
+    }
+    componentDidMount(){
+        console.log('Users.componentDidMount');
+        
         /*let db =SQLite.openDatabase({name: 'my.db', location: 'Documents'}, 
         ()=>{
             this.setState({
@@ -35,10 +40,10 @@ class Users extends Component{
         });*/
     }
     componentWillUnmount(){
-        console.log('users component did unmount');
+        console.log('Users.componentWillUnmount');
     }
     render(){
-        console.log('render');
+        console.log('Users.render');
         const {users,wait,error} = this.props;
         const {navigate} = this.props.navigation;
         
@@ -69,10 +74,9 @@ class Users extends Component{
         })
         return (
             <Container>
-                <Content>
-                    <Text>{error?error:""}</Text>
-                    {wait?<Spinner size="large" color={colors.accent}/>:usersViews}
-                </Content>
+                <Load wait={wait} error={wait?null:error} onError={()=>this.load()}>                
+                    {usersViews}                
+                </Load>
                 <Fab 
                     style={{backgroundColor:colors.accent}}
                     position="bottomLeft"

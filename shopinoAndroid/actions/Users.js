@@ -1,38 +1,34 @@
 import C from './constants'
 import {createMessage,createError,cleanError} from './index'
-import axios from '../axios'
-import {createAction,sendRequest,responseRecieved} from './helper'
+import {sendMessage} from './helper'
+import urls from '../api/tables'
+import {get,post} from '../api'
 
-export const loadUsers = ()=>(dispatch,getState)=>{
-    sendRequest(dispatch);
-    console.log('sendRequest');
-    axios.get('users')
-        .then(response => {
-            responseRecieved(dispatch);
-            console.log('responseRecieved',response);
-            if (response.data.success) {
-                dispatch(createAction(C.LOAD_USERS, response.data.data));
-            }
-            else
-                dispatch(createError('users','failed to load users'));
-        })
-        .catch(error => {
-            console.log('catch(error)',error);
-            responseRecieved(dispatch);
-            dispatch(createError('users',error.message));
-        });
+export const loadUsers = ()=>(dispatch)=>{
+    get(urls.users,dispatch);
 }
 
 export const addUser = ()=>(dispatch,getState)=>{
     const newUser = getState().newUser;
     if(checkUserInfo(newUser,dispatch,true)){
-        dispatch({
-            type:C.ADD_USER,
-            payload:newUser
+        newUser.repassword = null;
+        console.log('addUser:valid');
+        const date = new Date();
+        const parameters = {
+            ...newUser,
+            created_at:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
+        };
+        post(urls.users,parameters,dispatch,
+        (wired,err,data)=>{
+            if(err){
+                return console.log('addUser:post:callback:err:',err,data);
+            }
+            console.log('addUser:post:callback:',wired,';',err,':',data);
+            //getState().navigation.goBack('CreateUser');
+
+            sendMessage(urls.users,'کاربر با موفقیت اضافه شد',dispatch);
         });
         dispatch(cleanNewUser());
-        dispatch(createMessage('User','کاربر با موفقیت اضافه شد'));
-        getState().navigate('Users');
     }    
 }
 
@@ -93,7 +89,7 @@ const checkUserInfo = (info, dispatch, final = false)=>{
 
     if(email){
         if(email.replace(" ","").length == 0){
-            err('email','نام نمی تواند خالی باشد');    
+            err('email','ایمیل نمی تواند خالی باشد');    
         }
         else{
             cleanErr('email');
@@ -104,17 +100,19 @@ const checkUserInfo = (info, dispatch, final = false)=>{
     }
     
     if(type){
-        type = String(type);
-
+        type = parseInt(type);
+        console.log('checkUserInfo:type:',type);
         if(type == 1 || type == 2 || type == 3 || type == 4){
+            console.log('checkUserInfo:type:','passed');
             cleanErr('type');
         }
         else{
-            err('type','نام نمی تواند خالی باشد');    
+            console.log('checkUserInfo:type:','notpassed');
+            err('type','نوع کاربر باید انتخاب شود');
         }
     }
     else if(final){
-        err('type','نام نمی تواند خالی باشد');    
+        err('type','نوع کاربر باید انتخاب شود');  
     }
     
     if(password){

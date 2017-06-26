@@ -122,7 +122,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
             dispatch(login(username,password));
         },
         setNavigate(){
-            dispatch(setNavigate(ownProps.navigation.navigate));
+            dispatch(setNavigate(ownProps.navigation));
         }
     }
 }

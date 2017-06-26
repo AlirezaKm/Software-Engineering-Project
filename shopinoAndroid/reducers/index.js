@@ -10,17 +10,20 @@ const maxId =(state)=>{
     }
     return maxId;
 }
-export const navigate= (state=null,action)=>{
+export const navigation= (state=null,action)=>{
     if(action.type === C.SET_NAVIGATE)
         return action.payload;
     else
         return state;
 }
 export const waitForResponse = (state=false,action)=>{
+    console.log('reducers:waitForResponse');
     switch(action.type){
         case C.SEND_REQUEST:
+            console.log('reducers:waitForResponse:',true);
             return true;        
         case C.RECEIVE_RESPONE:
+            console.log('reducers:waitForResponse:',false);
             return false;
         default:
             return state;
@@ -546,7 +549,7 @@ const newOrders = (state = [],action)=>{
     }
 }
 export default combineReducers({
-    navigate,
+    navigation,
     waitForResponse,
     userInfo,
     error,

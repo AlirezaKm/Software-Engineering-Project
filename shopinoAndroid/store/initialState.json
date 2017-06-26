@@ -1,5 +1,5 @@
 {
-    "navigate":null,
+    "navigation":null,
     "waitForResponse":false,
     "userInfo":{
         "authorized":false,

@@ -10,6 +10,9 @@ export const setNavigate = (navigate) =>({
     payload:navigate
 })
 
+export const loadInfo = (tableName,dispatch)=>{
+    get(tableName,dispatch);
+}
 
 
 export const login = (username,password)=> (dispatch,getState)=> {
@@ -46,7 +49,7 @@ export const login = (username,password)=> (dispatch,getState)=> {
         else{
             dispatch(createError('اطلاعات وارد شده صحیح نمی باشد'));
         }*/
-        getState().navigate('HomePage');
+        getState().navigation.navigate('HomePage');
     },
     1000);
 }

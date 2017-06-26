@@ -1,12 +1,18 @@
 import React,{Component} from 'react'
 import {Container,Content,Fab,Icon,Picker,Item,Button} from 'native-base'
 import {connect} from 'react-redux'
-import {Text,Field} from '../common'
+import {Text,Field,ButtonLoad} from '../common'
 import {colors} from '../styles'
 import {changeNewUser,addUser} from '../../actions/Users'
 class CreateUser extends Component{
     static navigationOptions={
         title:'اضافه کردن کاربر'
+    }
+    constructor(props){
+        super(props);
+        this.state={
+            selectedType:'1'
+        }
     }
     changeUserInfo(field,value){
         const {changeUser} = this.props;
@@ -14,24 +20,26 @@ class CreateUser extends Component{
         info[field] = value;
         changeUser(info);
     }
-    constructor(props){
-        super(props);
-        this.state={
-            selectedType:1
-        }
-    }
     changeSelectedType(selectedType){
         this.setState({
             selectedType:selectedType
         });
         this.changeUserInfo('type',selectedType);
     }
+    onComponentDidMount(){
+        this.changeSelectedType(this.state.selectedType);
+    }
     render(){
-        const {createUser,error} = this.props;
-
+        const {wait,createUser,error,message} = this.props;
+        console.log('CreateUser.render:wait:',wait);
+        if(message){
+            setTimeout(()=>this.props.navigation.goBack(),3000);
+        }
         return (
             <Container style={{backgroundColor:'white'}}>
                 <Content>
+                    {message&&<Text success background>{message}</Text>}
+                    {error.users&&<Text error>{error.users}</Text>}
                     <Field
                         icon="person"
                         label="نام"
@@ -84,17 +92,21 @@ class CreateUser extends Component{
                         </Picker>
                     </Field>
                 </Content>
-                <Button block style={{backgroundColor:colors.accent}} 
-                    onPress={()=>createUser()}> 
-                    <Text big> ثبت! </Text>
-                </Button>
+                <ButtonLoad wait={wait}>
+                    <Button block style={{backgroundColor:colors.accent}} 
+                        onPress={()=>createUser()}> 
+                        <Text big> ثبت! </Text>
+                    </Button>
+                </ButtonLoad>
             </Container>
         )
     }
 }
 
 const mapStateToProps = (state)=>({
-    error:state.error    
+    wait:state.waitForResponse,
+    error:state.error,
+    message:state.message.users
 });
 const mapDispatchToProps = (dispatch)=>({
     changeUser:(info)=>{

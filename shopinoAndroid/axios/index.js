@@ -11,7 +11,6 @@ const config ={
         'Authorization': a1+a2
     },*/
     timeout: 2000,
-    
 };
 
 

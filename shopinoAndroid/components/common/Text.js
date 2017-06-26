@@ -2,7 +2,7 @@ import React from 'react'
 import {Text} from 'native-base'
 import {textStyle,colors} from '../styles'
 
-const MyText = ({children,style,active,white,secondary,small,big,error,center,padded}) =>{
+const MyText = ({children,style,active,white,secondary,small,big,error,center,padded,success,background}) =>{
     const extraStyle={};
     if(active){
         extraStyle.opacity=0.84;
@@ -21,6 +21,12 @@ const MyText = ({children,style,active,white,secondary,small,big,error,center,pa
     }
     if(error){
         extraStyle.color=colors.negative;
+    }
+    if(success && background){
+        extraStyle.color= "white";
+        extraStyle.backgroundColor = colors.positive;
+        extraStyle.padding=8;
+        extraStyle.textAlign="center";
     }
     if(center){
         extraStyle.alignSelf="center";

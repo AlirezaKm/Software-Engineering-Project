@@ -12,23 +12,23 @@ class CardItem extends Component{
         } =  this.props;
         return(
             <View style={Object.assign({},{
-                        margin:8,
-                        backgroundColor:'white',
-                        padding:8,
-                        elevation:2,
-                        borderRadius:16},parentStyle)}>
-                        <TouchableNativeFeedback  
-                        style={{
-                            borderRadius:16
-                        }}
-                        onPress={onPress}
-                        onLongPress={onLongPress}>
+                margin:8,
+                backgroundColor:'white',
+                padding:8,
+                elevation:2,
+                borderRadius:16},parentStyle)}>
+                <TouchableNativeFeedback
+                style={{
+                    borderRadius:16
+                }}
+                onPress={onPress}
+                onLongPress={onLongPress}>
 
-                            <View style={style}>
-                            {children}
-                            </View>
+                    <View style={style}>
+                    {children}
+                    </View>
 
-                        </TouchableNativeFeedback>
+                </TouchableNativeFeedback>
             </View>
         )
     }
