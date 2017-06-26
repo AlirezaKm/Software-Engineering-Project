@@ -18,7 +18,7 @@ export const navigate= (state=null,action)=>{
 }
 export const waitForResponse = (state=false,action)=>{
     switch(action.type){
-        case C.SEND_AUTH_REQUEST:
+        case C.SEND_REQUEST:
             return true;        
         case C.RECEIVE_RESPONE:
             return false;
@@ -332,6 +332,8 @@ export const users = (state=[],action)=>{
                     create_date_time:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
                 }                
             ]
+        case C.LOAD_USERS:
+            return action.payload;
         default:
             return state;
     }

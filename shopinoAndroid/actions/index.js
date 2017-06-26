@@ -1,8 +1,8 @@
 import C from './constants'
-import { NavigationActions } from 'react-navigation'
-const navigateAction = NavigationActions.navigate({
+
+/*const navigateAction = NavigationActions.navigate({
   routeName: 'Profile'
-});
+});*/
 
 
 export const setNavigate = (navigate) =>({
@@ -10,13 +10,10 @@ export const setNavigate = (navigate) =>({
     payload:navigate
 })
 
-const sendRequest = (dispatch)=> 
-    dispatch({
-        type:C.SEND_AUTH_REQUEST
-    });
+
 
 export const login = (username,password)=> (dispatch,getState)=> {
-    sendRequest(dispatch);
+    //sendRequest(dispatch);
     dispatch({
         type:C.CHANGE_USER_INFO,
         payload:{

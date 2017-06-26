@@ -1,8 +1,9 @@
 import React,{Component} from 'react'
-import {Container,Content,Fab,Icon} from 'native-base'
+import {Container,Content,Fab,Icon,Spinner} from 'native-base'
 import {connect} from 'react-redux'
 import {Text,CardRow} from '../common'
 import {colors} from '../styles'
+import {loadUsers} from '../../actions/Users'
 //import SQLite from 'react-native-sqlite-storage'
 
 class Users extends Component{
@@ -15,7 +16,13 @@ class Users extends Component{
             message:''
         }*/
     }
+    componentWillMount(){
+
+    }
     componentDidMount(){
+        const {loadUsersInfo} = this.props;
+        loadUsersInfo();
+        console.log('users component did mount');
         /*let db =SQLite.openDatabase({name: 'my.db', location: 'Documents'}, 
         ()=>{
             this.setState({
@@ -27,8 +34,12 @@ class Users extends Component{
             });
         });*/
     }
+    componentWillUnmount(){
+        console.log('users component did unmount');
+    }
     render(){
-        const {users} = this.props;
+        console.log('render');
+        const {users,wait,error} = this.props;
         const {navigate} = this.props.navigation;
         
         const usersViews = users.map(user =>{
@@ -53,13 +64,14 @@ class Users extends Component{
                     ItemOne={user.fname}
                     ItemTwo={user.lname}
                     badgeTop={type}
-                    badgeBottom={user.create_date_time}
+                    badgeBottom={user.created_at}
             />)
         })
         return (
             <Container>
                 <Content>
-                    {usersViews}
+                    <Text>{error?error:""}</Text>
+                    {wait?<Spinner size="large" color={colors.accent}/>:usersViews}
                 </Content>
                 <Fab 
                     style={{backgroundColor:colors.accent}}
@@ -73,7 +85,14 @@ class Users extends Component{
 }
 
 const mapStateToProps = (state)=>({
-    users:state.users
+    error:state.error.users,
+    users:state.users,
+    wait:state.waitForResponse
 });
+const mapDispatchToProps = (dispatch)=>({
+    loadUsersInfo:()=>{
+        dispatch(loadUsers());
+    }
+})
 
-export default connect(mapStateToProps)(Users);
+export default connect(mapStateToProps,mapDispatchToProps)(Users);

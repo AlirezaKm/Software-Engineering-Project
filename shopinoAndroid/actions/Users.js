@@ -1,6 +1,27 @@
 import C from './constants'
 import {createMessage,createError,cleanError} from './index'
+import axios from '../axios'
+import {createAction,sendRequest,responseRecieved} from './helper'
 
+export const loadUsers = ()=>(dispatch,getState)=>{
+    sendRequest(dispatch);
+    console.log('sendRequest');
+    axios.get('users')
+        .then(response => {
+            responseRecieved(dispatch);
+            console.log('responseRecieved',response);
+            if (response.data.success) {
+                dispatch(createAction(C.LOAD_USERS, response.data.data));
+            }
+            else
+                dispatch(createError('users','failed to load users'));
+        })
+        .catch(error => {
+            console.log('catch(error)',error);
+            responseRecieved(dispatch);
+            dispatch(createError('users',error.message));
+        });
+}
 
 export const addUser = ()=>(dispatch,getState)=>{
     const newUser = getState().newUser;
