@@ -6,7 +6,7 @@ export const get = (table,dispatch,callback = null,parameters = null)=>{
     dispatch(cleanError(table));
     const type = "LOAD_"+table.toUpperCase();
     sendRequest(dispatch);
-    console.log('sendRequest');
+    console.log('sendRequest:get');
     let url = table;
     if(parameters){
         url += parameters;
@@ -25,7 +25,7 @@ export const get = (table,dispatch,callback = null,parameters = null)=>{
                 }*/
             }
             if(callback){
-                callback();
+                callback(null,response.data);
             }
             responseRecieved(dispatch);
         })

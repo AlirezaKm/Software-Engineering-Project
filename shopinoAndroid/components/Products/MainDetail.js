@@ -9,6 +9,7 @@ import {
     changeNewProduct,
     changeSelectedCategory,
     changeSelectedSubCategory,
+    loadFactors,
     loadCategories} 
 from '../../actions'
 import FactorModal from './FactorModal'
@@ -29,11 +30,6 @@ class MainDetail extends Component{
             selectedCategory:-1,
             selectedSubCategory:-1
         }
-        this.setModalVisible = this.setModalVisible.bind(this);
-        this.changeProductInfo = this.changeProductInfo.bind(this);
-        this.onFactorChanged = this.onFactorChanged.bind(this);
-        this.onCategoryChanged = this.onCategoryChanged.bind(this);
-        this.onSubCategoryChanged = this.onSubCategoryChanged.bind(this);
     }
     componentWillMount(){
         this.props.loadInfo();
@@ -42,9 +38,9 @@ class MainDetail extends Component{
         console.log('onComponentDidMount called');
         const {edit} = this.props;
         if(edit.code){
-            this.onFactorChanged(edit.factorId);
-            this.onCategoryChanged(edit.categoryId);
-            this.onSubCategoryChanged(edit.subCategoryId);
+            this.onFactorChanged(edit.factor.id);
+            this.onCategoryChanged(edit.category.id);
+            this.onSubCategoryChanged(edit.subCategory.id);
         }
     }
     setModalVisible(modal,visible){
@@ -109,12 +105,11 @@ class MainDetail extends Component{
             changeCategory,
             error,
             edit,
+            loadingFactors,
             loadingCategories,
             loadingSubCategories
         } = this.props;
         const {factorModal,categoryModal,subCategoryModal} = this.state;
-        
-        console.log('selectedFactor:', this.state.selectedFactor);
 
         const chooseItem = <Item label='انتخاب کنید' value="-1" key={-1} disabled/>;
 
@@ -150,6 +145,7 @@ class MainDetail extends Component{
 
                     <Card column>
                         <Field 
+                            load={loadingFactors}
                             icon="md-cart" 
                             label="فاکتور"
                             error={error.factorId?error.factorId:null}>
@@ -216,7 +212,7 @@ class MainDetail extends Component{
                                         this.setModalVisible('subCategoryModal',true)
                                     }
                                     else{
-                                        this.onCategoryChanged();
+                                        this.changeProductInfo('categoryId',-1);
                                     }
                                 }}>
                                 <Icon name="add-circle" style={{color:colors.accent}}/>
@@ -252,6 +248,7 @@ const mapDispatchToProps = (dispatch,ownProps)=>({
     },
     loadInfo:()=>{
         dispatch(loadCategories());
+        dispatch(loadFactors());
     }
 })
 export default connect(mapStateTopProps,mapDispatchToProps)(MainDetail)

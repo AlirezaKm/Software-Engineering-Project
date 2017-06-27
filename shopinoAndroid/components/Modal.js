@@ -37,7 +37,7 @@ export default class MyModal extends Component{
         
     }
     render(){        
-        const {visible,title,children,setVisible,actionSheet} = this.props;        
+        const {visible,title,children,setVisible,actionSheet,onFade} = this.props;        
         /*let actionSheetStyle={};
         if(actionSheet){
             actionSheetStyle={
@@ -53,7 +53,10 @@ export default class MyModal extends Component{
             }
             */
         const fade = ()=>{
-            setVisible(false); //TODO: find a way to do it internally
+            setVisible(false);
+            if(onFade)
+                onFade();
+             //TODO: find a way to do it internally
         };
 
         return(

@@ -32,13 +32,13 @@ class SecondaryDetail extends Component{
                         placeholder="قیمت خرید واحد"
                         label="تومان"
                         labelEnd
-                        value={edit.count?''+edit.buyPrice:''}
+                        value={edit.buyPrice?''+edit.buyPrice:''}
                         onChange={(event)=>this.changeProductInfo('buyPrice',event.nativeEvent.text)}
                         error={error.buyPrice?error.buyPrice:null}/>
                     <Field
                         icon="cash"
                         placeholder="قیمت فروش واحد"
-                        value={edit.count?''+edit.sellPrice:''}
+                        value={edit.sellPrice?''+edit.sellPrice:''}
                         label="تومان"
                         labelEnd
                         onChange={(event)=>this.changeProductInfo('sellPrice',event.nativeEvent.text)}

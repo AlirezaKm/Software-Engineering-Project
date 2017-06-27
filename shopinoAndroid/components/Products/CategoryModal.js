@@ -1,16 +1,12 @@
 import React,{Component} from 'react'
 import {Button} from 'native-base'
-import {Text,Card,CardItem,Field} from '../common'
+import {Text,Card,CardItem,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import Modal from '../Modal'
 import {connect} from 'react-redux'
-import {changeNewCategory,addCategory} from '../../actions'
+import {changeNewCategory,addCategory,cleanNewCatgory,cleanError} from '../../actions'
 
 class CategoryModal extends Component{ 
-    constructor(props){
-        super(props);
-        this.changeCategoryInfo = this.changeCategoryInfo.bind(this);
-    }
     changeCategoryInfo(field,value){
         const {changeCategory} = this.props;
         let info={};
@@ -18,13 +14,22 @@ class CategoryModal extends Component{
         changeCategory(info);// change Category Info in the store
     }
     render(){
-        const {visible,setVisible,error,createCategory,message} = this.props;
+        const {visible,setVisible,error,createCategory,message,clean,wait} = this.props;
+        const onFade = ()=>clean();
+        if(message){
+            setTimeout(()=>{
+                setVisible(false);
+                onFade();
+            },1000);
+        }
         return(
             <Modal
                 title="اضافه کردن دسته" 
                 visible={visible}
-                setVisible={setVisible}>
+                setVisible={setVisible}
+                onFade={onFade}>
                 <Card column>
+                    {message&&<Text success background>{message}</Text>}
                     <Field
                         icon="add"
                         label="نام"
@@ -32,11 +37,13 @@ class CategoryModal extends Component{
                         onChange={(event)=>this.changeCategoryInfo('name',event.nativeEvent.text)}
                         error={error.categoryName?error.categoryName:null}                  
                     />
-                    <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} onPress={()=>{
-                        createCategory();
-                    }}>
-                        <Text> ثبت </Text>
-                    </Button>
+                    <SimpleLoad wait={wait}>
+                        <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} onPress={()=>{
+                            createCategory();
+                        }}>
+                            <Text> ثبت </Text>
+                        </Button>
+                    </SimpleLoad>
                 </Card>
             </Modal>
             );
@@ -44,6 +51,8 @@ class CategoryModal extends Component{
 }
 
 const mapStateToProps =(state,ownProps)=>({
+    wait:state.waitForResponse,
+    message:state.message.category,
     error:state.error,
 });
 const mapDispatchToProps = (dispatch,ownProps)=>({
@@ -52,6 +61,10 @@ const mapDispatchToProps = (dispatch,ownProps)=>({
     },
     createCategory:()=>{
         dispatch(addCategory());
+    },
+    clean:()=>{
+        dispatch(cleanNewCatgory());
+        dispatch(cleanError('categoryName'));
     }
 });
 

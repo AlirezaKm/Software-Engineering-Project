@@ -2,10 +2,10 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {Icon,Container,Fab,View,Badge,Body,FooterTab,Footer,Button,Segment,Spinner} from 'native-base'
 import {colors} from '../styles'
-import {Text,Card,CardItem,textShadow,Field} from '../common'
+import {Text,Card,CardItem,textShadow,Field,Load,CardRow} from '../common'
 import Modal from '../Modal'
 import ActionSheet from '../ActionSheet'
-import {changeSelectedProduct,deleteProduct} from '../../actions'
+import {changeSelectedProduct,deleteProduct,loadProducts} from '../../actions'
 
 class ProductList extends React.Component{ 
     constructor(props){
@@ -21,6 +21,9 @@ class ProductList extends React.Component{
     static navigationOptions={
         title:'انبارداری'
     }
+    componentWillMount(){
+        this.props.load();
+    }
     setModalVisible(visible,productCode=-1){
         this.setState({
             modalVisible:visible,
@@ -33,41 +36,30 @@ class ProductList extends React.Component{
         })
     }
     render(){
-        const {products,changeProduct,removeProduct} = this.props;
+        const {wait,error,products,changeProduct,removeProduct} = this.props;
         const {navigate} = this.props.navigation;
         const {modalVisible,searchVisible} = this.state;
 
-        const productList = products.map((item)=>(
-            <Card key={item.code} column>
-                <CardItem onLongPress={()=>this.setModalVisble(true,item.code)} onPress={()=>{
-                    changeProduct(item.code,()=>navigate('ProductCreate',{title:'ویرایش محصول'}));                    
-                }}>
-                    <View style={{flexDirection:'row',justifyContent:'space-between'}}> 
-                        <View style={{flexDirection:'row'}}>
-                        <Icon name="pricetags" style={{color:colors.primary,margin:2}}/>               
-                        <Text style={{margin:2}} active>{item.name}</Text>
-                        </View>
-                        <Badge style={{backgroundColor:colors.accent}}><Text style={{padding:4}}>{item.sellPrice} تومان</Text></Badge>
-                    </View>
-                    <View style={{marginTop:8,flexDirection:'row',justifyContent:'space-around'}}>
-                        <View style={{flex:1,flexDirection:'row',borderColor:colors.divider,borderTopWidth:0.5,borderLeftWidth:1}}>
-                            <Icon name="md-arrow-dropleft" style={{color:colors.divider,paddingHorizontal:8}}/>
-                            <Text style={{paddingTop:2}}>{item.category}</Text>
-                        </View>
-                        <View style={{flex:1,flexDirection:'row',borderColor:colors.divider,borderTopWidth:0.5,}}>
-                            <Icon name="md-arrow-dropleft" style={{color:colors.divider,paddingHorizontal:8}}/>
-                            <Text style={{paddingTop:2}}>{item.subCategory}</Text>
-                        </View>
-                        <Badge style={{flex:1,padding:2}} style={{backgroundColor:colors.primary}}><Text style={{padding:4}}>تعداد: {item.count}</Text></Badge>
-                    </View>
-                </CardItem>
-            </Card>
+        console.log(products);
+        const productList = products.map((product)=>(            
+            <CardRow
+                onLongPress={()=>this.setModalVisble(true,product.code)} 
+                onPress={()=>{
+                    changeProduct(product.code,()=>navigate('ProductCreate',{title:'ویرایش محصول'}))
+                }}                    
+                key={product.code}
+                title={product.name}
+                icon="pricetag"
+                ItemOne={product.category.name}
+                ItemTwo={product.subCategory.name}
+                badgeTop={product.sellPrice+" تومان"}
+                badgeBottom={product.count+" عدد"}/>
         ));
         return(
             <Container style={{backgroundColor:'white'}}>
-                <View style={{paddingVertical:4,paddingHorizontal:8}}>
-                    {productList}  
-                </View>
+                <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>
+                    {productList}
+                </Load>
 
                 <ActionSheet title="جستجو" visible={searchVisible} setVisible={(visible)=>this.setSearchVisible(visible)}>    
                 </ActionSheet>
@@ -104,7 +96,7 @@ class ProductList extends React.Component{
         );
     }
 }
-const mapStateToProps = (state, ownProps) => {
+/*const mapStateToProps = (state, ownProps) => {
     let {products} =state;
     const {name,categoryId,subCategoryId} = state.search;
 
@@ -141,8 +133,13 @@ const mapStateToProps = (state, ownProps) => {
         })            
 
     }
-}
+}*/
 
+const mapStateToProps = (state, ownProps) =>({
+    wait:state.waitForResponse,
+    error:state.error.products,
+    products:state.products
+})
 
 const mapDispatchToProps = (dispatch, ownProps)=>({
     changeProduct:(productCode,callback)=>{
@@ -151,6 +148,9 @@ const mapDispatchToProps = (dispatch, ownProps)=>({
     },
     removeProduct:(productCode)=>{
         dispatch(deleteProduct(productCode));
+    },
+    load:()=>{
+        dispatch(loadProducts());
     }
 })
 

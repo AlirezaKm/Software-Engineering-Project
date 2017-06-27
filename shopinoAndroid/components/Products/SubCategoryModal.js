@@ -1,10 +1,10 @@
 import React,{Component} from 'react'
 import {Button} from 'native-base'
-import {Text,Card,CardItem,Field} from '../common'
+import {Text,Card,CardItem,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import Modal from '../Modal'
 import {connect} from 'react-redux'
-import {changeNewSubCategory,addSubCategory} from '../../actions'
+import {changeNewSubCategory,addSubCategory,cleanError,cleanNewSubCategory} from '../../actions'
 
 class SubCategoryModal extends Component{ 
     constructor(props){
@@ -18,13 +18,22 @@ class SubCategoryModal extends Component{
         changeSubCategory(info);// change Category Info in the store
     }
     render(){
-        const {visible,setVisible,error,createSubCategory,message} = this.props;
+        const {wait,visible,setVisible,error,createSubCategory,message,clean} = this.props;
+        const onFade = ()=>clean();
+        if(message){
+            setTimeout(()=>{
+                setVisible(false);
+                onFade();
+            },1000);
+        }
         return(
             <Modal
                 title="اضافه کردن زیر دسته" 
                 visible={visible}
-                setVisible={setVisible}>
+                setVisible={setVisible}
+                onFade={onFade}>
                 <Card column>
+                    {message&&<Text success background>{message}</Text>}
                     <Field
                         icon="add"
                         label="نام"
@@ -32,11 +41,13 @@ class SubCategoryModal extends Component{
                         onChange={(event)=>this.changeSubCategoryInfo('name',event.nativeEvent.text)}
                         error={error.subCategoryName?error.subCategoryName:null}                  
                     />
-                    <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} onPress={()=>{
-                        createSubCategory();
-                    }}>
-                        <Text> ثبت </Text>
-                    </Button>
+                    <SimpleLoad wait={wait}>
+                        <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} onPress={()=>{
+                            createSubCategory();
+                        }}>
+                            <Text> ثبت </Text>
+                        </Button>
+                    </SimpleLoad>
                 </Card>
             </Modal>
             );
@@ -44,6 +55,8 @@ class SubCategoryModal extends Component{
 }
 
 const mapStateToProps =(state,ownProps)=>({
+    wait:state.waitForResponse,
+    message:state.message.subCategory,
     error:state.error,
 });
 const mapDispatchToProps = (dispatch,ownProps)=>({
@@ -52,6 +65,10 @@ const mapDispatchToProps = (dispatch,ownProps)=>({
     },
     createSubCategory:()=>{
         dispatch(addSubCategory());
+    },
+    clean:()=>{
+        dispatch(cleanError('subCategoryName'));
+        dispatch(cleanNewSubCategory());
     }
 });
 

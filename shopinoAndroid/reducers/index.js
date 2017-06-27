@@ -53,7 +53,7 @@ export const loadingSubCategories = (state=false,action)=>{
 
 export const loadingFactors = (state=false,action)=>{
     switch(action.type){
-        case C.SEND_FACTORS:            
+        case C.SEND_REQUEST_FACTORS:            
             return true;        
         case C.RECEIVE_RESPONE_FACTORS:            
             return false;
@@ -61,7 +61,16 @@ export const loadingFactors = (state=false,action)=>{
             return state;
     }
 }
-
+export const loadingProperties = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_PROPERTY:            
+            return true;        
+        case C.RECEIVE_RESPONE_PROPERTY:            
+            return false;
+        default:
+            return state;
+    }
+}
 export const userInfo = (state={},action)=>{
     switch(action.type){
         case C.CHANGE_USER_INFO:
@@ -220,7 +229,8 @@ export const properties = (state=[],action)=>{
                     name:name
                 }
             ];            
-
+        case C.LOAD_PROPERTIES:
+            return action.payload;
         default:
             return state;
     }
@@ -275,6 +285,8 @@ export const products = (state=[],action)=>{
             ]            
         case C.REMOVE_PRODUCT:
             return state.filter(item=> item.code !== action.payload);
+        case C.LOAD_PRODUCTS:
+            return action.payload;
         default:
             return state;
     }
@@ -303,6 +315,8 @@ export const factors = (state=[],action)=>{
                     create_date_time:create_date_time
                 }
             ];
+        case C.LOAD_FACTORS:
+            return action.payload;
         default:
             return state;
     }
@@ -396,11 +410,14 @@ export const newUser = (state={},action)=>{
 }
 
 export const newFactor=(state={},action)=>{
-    if(action.type === C.CHANGE_NEW_FACTOR){
-        return Object.assign({},state,action.payload);
+    switch(action.type){
+        case C.CHANGE_NEW_FACTOR:
+            return Object.assign({},state,action.payload);
+        case C.CLEAN_NEW_FACTOR:
+            return {};
+        default:
+            return state;
     }
-    else
-        return state;
 }
 
 export const newProperty=(state={},action)=>{
@@ -596,6 +613,7 @@ export default combineReducers({
     loadingCategories,
     loadingSubCategories,
     loadingFactors,
+    loadingProperties,
     userInfo,
     error,
     newCategory,

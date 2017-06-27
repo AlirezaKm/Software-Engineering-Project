@@ -1,6 +1,7 @@
 import C from './constants'
 import {get,post} from '../api'
 import urls from '../api/tables'
+import {sendMessage} from './helper'
 /*const navigateAction = NavigationActions.navigate({
   routeName: 'Profile'
 });*/
@@ -78,19 +79,24 @@ export const cleanMessage = (field)=>{
 };
 
 //   ------------------ factors ------------------
+export const loadFactors = (page=1)=>(dispatch)=>{
+    dispatch({
+        type:C.SEND_REQUEST_FACTORS
+    })
+    const parameters = "?page="+page;
+    get(urls.factors,dispatch,()=>{
+        dispatch({
+            type:C.RECEIVE_RESPONE_FACTORS
+        })
+    },parameters);
+}
 
 export const addFactor = () =>(dispatch,getState) =>{
-    if(checkFactorInfo(getState().newFactor,dispatch,true)){
-        dispatch({
-            type:C.ADD_FACTOR,
-            payload:getState().newFactor
-        })
-        dispatch(createMessage('factor','فاکتور ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_FACTOR,
-            payload:{
-                id:getState().factors[getState().factors.length-1].id
-            }
+    const newFactor = getState().newFactor;
+    if(checkFactorInfo(newFactor,dispatch,true)){
+        post(urls.factors,newFactor,dispatch,()=>{
+            sendMessage('factor','فاکتور ایجاد شد',dispatch);
+            dispatch(loadFactors());
         })
     }
 };
@@ -149,6 +155,9 @@ export const changeSelectedFactor = (factorId)=>({
     payload:factorId
  });
 
+export const cleanNewFactor=()=>({
+    type:C.CLEAN_NEW_FACTOR
+})
 
 //   ------------------ categories ------------------
 export const loadCategories = ()=>(dispatch,getState)=>{
@@ -162,12 +171,14 @@ export const loadCategories = ()=>(dispatch,getState)=>{
         });
     });
 }
-
 export const addCategory = ()=>(dispatch,getState) =>{
     const newCategory = getState().newCategory;
     if(checkCategoryInfo(newCategory,dispatch,true)){
-        post(urls.categories,)
-        dispatch(createMessage('category','دسته ایجاد شد'));
+        post(urls.categories,newCategory,dispatch,()=>{
+            sendMessage('category','دسته ایجاد شد',dispatch);
+            dispatch(loadCategories());
+        });
+        
     }
 };
 
@@ -180,10 +191,12 @@ export const editCategory = (id,name)=>({
 });
 export const changeSelectedCategory = (categoryId)=>(dispatch)=>{
     dispatch(loadSubCategories(categoryId));
+    dispatch(changeSelectedSubCategory(-1));
     dispatch({
         type:C.CHANGE_SELECTED_CATEGORY,
         payload:categoryId
     });
+
 };
 
 export const changeNewCategory = (categoryInfo)=> (dispatch,getState)=>{
@@ -219,6 +232,9 @@ const checkCategoryInfo = (info,dispatch,final = false)=>{
     return success;  
 }
 
+export const cleanNewCatgory = ()=>({
+    type:C.CLEAN_NEW_CATEGORY
+});
 
 
 //   ------------------- subcategories -------------------
@@ -236,23 +252,16 @@ export const loadSubCategories = (categoryId)=>(dispatch)=>{
 }
 
 export const addSubCategory = ()=>(dispatch,getState) =>{
-    if(checkSubCategoryInfo(getState().newSubCategory,dispatch,true)){
+    const newSubCategory = getState().newSubCategory;
+    if(checkSubCategoryInfo(newSubCategory,dispatch,true)){
         const selectedCategory = getState().selectedCategory;
-        dispatch({
-            type:C.ADD_SUB_CATEGORY,
-            payload:{
-                categoryId:selectedCategory,
-                ...getState().newSubCategory
-            }
-        })
-        dispatch(createMessage('subCategory','زیر دسته ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_SUB_CATEGORY,
-            payload:{
-                id:getState().subCategories[getState().subCategories.length-1].id,
-                categoryId:selectedCategory
-            }
-        })
+        post(urls.subcategories,{
+            categoryId:selectedCategory,
+            ...getState().newSubCategory
+        },dispatch,()=>{
+            dispatch(loadSubCategories(selectedCategory));
+            sendMessage('subCategory','زیر دسته ایجاد شد',dispatch);
+        });
     }
 };
 export const editSubCategory = (id,categoryId,name)=>({
@@ -263,10 +272,16 @@ export const editSubCategory = (id,categoryId,name)=>({
         name:name
     }
 });
-export const changeSelectedSubCategory = (subCategoryId)=>({
-    type:C.CHANGE_SELECTED_SUB_CATEGORY,
-    payload:subCategoryId
-});
+export const changeSelectedSubCategory = (subCategoryId)=>(dispatch,getState)=>{
+    dispatch(loadProperties(subCategoryId));
+    if(subCategoryId >= 1){
+        checkPropertyInfo(getState().newProperty,dispatch);
+    }
+    dispatch({
+        type:C.CHANGE_SELECTED_SUB_CATEGORY,
+        payload:subCategoryId
+    });
+};
 
 export const changeNewSubCategory = (subCategoryInfo)=> (dispatch,getState)=>{
     dispatch({
@@ -301,13 +316,15 @@ const checkSubCategoryInfo = (info,dispatch,final = false)=>{
     return success;  
 }
 
+export const cleanNewSubCategory = ()=>({
+    type:C.CLEAN_NEW_SUB_CATEGORY
+});
+
 //
 export const changeSelectedOrderFactor = (orderFactorId)=>({
     type:C.CHANGE_SELECTED_ORDER_FACTOR,
     payload:orderFactorId
  });
-
-
 
 export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
     dispatch({
@@ -334,56 +351,37 @@ export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
         }
     });
 };
-
-
+export const loadProducts = (page)=>(dispatch)=>{
+    get(urls.products,dispatch);
+}
 export const addProduct = () =>(dispatch,getState) =>{
-    console.log('add Product');
     const newProduct = getState().newProduct;
     if(checkProductInfo(newProduct,dispatch,true)){
-        
-        console.log('add Product: passed');
-
-        if(newProduct.code){
-            console.log('edit Product: on');
-            dispatch({
-                type:C.EDIT_PRODUCT,
-                payload:newProduct
-            });
-
-            dispatch({
-                type:C.EDIT_PRODUCT_PROPERTY,
-                payload:getState().newProductProperty
-            });            
+        if(newProduct.code){//edit 
         }
-        else{
-            dispatch({
-                type:C.ADD_PRODUCT,
-                payload:newProduct
-            });
-
+        else{//add New
             const productCode = getState().products[getState().products.length-1].code;
-
-            dispatch({
-                type:C.CHANGE_NEW_PRODUCT,
-                payload:{
-                    code:productCode
-                }
+            const date = new Date();
+            const parameters ={
+                code:productCode,
+                newProduct,
+                /*factor:getState().factors.find(item=>item.id == newProduct.factorId),
+                name:newProduct.name,
+                category:getState().categories.find(item=>item.id == newProduct.categoryId),
+                subCategory:getState().subCategories.find(item=>item.id == newProduct.subCategoryId),
+                count:newProduct.count,
+                sellPrice: newProduct.sellPrice,
+                buyPrice: newProduct.buyPrice,*/
+                created_at:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
+            };
+            console.log('addProduct:parameters:',parameters);
+            post(urls.products,parameters,dispatch,(err,data)=>{
+                dispatch(loadProducts());
+                sendMessage('products','محصول ایجاد شد',dispatch);
             });
 
-            dispatch({
-                type:C.ADD_PRODUCT_PROPERTY,
-                payload:getState().newProductProperty.map(item=>{
-                    if(item.value){
-                        return{
-                        productCode:productCode,
-                        ...item
-                        }
-                    }
-                })
-            });
+            //add Product Properties
         }
-        console.log('add Product: dispatch');
-        dispatch(createMessage('product','محصول ایجاد شد'));
     }
 };
 
@@ -540,48 +538,58 @@ const checkProductInfo = (info,dispatch, final = false)=>{
 
 
 
-export const addProperty = () =>(dispatch,getState) =>{
-    console.log('addProperty:start');
-    console.log('selected Sub Category: ',getState().selectedSubCategory);
-    console.log(getState().properties.length);
-    if(checkPropertyInfo(getState().newProperty,dispatch)){
-        console.log('addProperty:passed');
-        const newProp = {
-            subCategoryId:getState().selectedSubCategory,
-            ...getState().newProperty
-        }
-        dispatch({
-            type:C.ADD_PROPERTY,
-            payload:newProp
-        })
-        console.log('addProperty:added:');
-        console.log(newProp.name);
-        console.log(newProp.subCategoryId);
+export const loadProperties = (subCategoryId)=>(dispatch)=>{
+    dispatch({
+        type:C.SEND_REQUEST_PROPERTY
+    });
+    const url = urls.properties;
+    
+    const parameters = "?subCategoryId="+subCategoryId;
 
-        dispatch(createMessage('property','ویژگی ایجاد شد'));
+    console.log('loadProperties:url:',url,parameters);
+    get(url,dispatch,()=>{
         dispatch({
-            type:C.CHANGE_NEW_PROPERTY,
-            payload:{
-                id:getState().properties[getState().properties.length-1].id
-            }
+            type:C.RECEIVE_RESPONE_PROPERTY
         })
+    },parameters);
+}
+
+export const addProperty = () =>(dispatch,getState) =>{
+    const selectedSubCategory = getState().selectedSubCategory;
+    const newProperty={
+        ...getState().newProperty,
+        subCategoryId:selectedSubCategory
+    }
+    if(checkPropertyInfo(newProperty,dispatch,true)){
+        post(urls.properties,newProperty,dispatch,()=>{
+            dispatch(loadProperties(selectedSubCategory));
+            sendMessage('property','ویژگی ایجاد شد',dispatch);
+        });
     }
 };
 
-export const changeNewProperty = (propertyInfo)=>({
-    type:C.CHANGE_NEW_PROPERTY,
-    payload:{
-        ...propertyInfo
-    }
-})
+export const changeNewProperty = (propertyInfo)=>(dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_PROPERTY,
+        payload:{
+            ...propertyInfo
+        }
+    });
+    checkPropertyInfo(getState().newProperty,dispatch);
+};
 
-const checkPropertyInfo = (info,dispatch)=>{
+const checkPropertyInfo = (info,dispatch,final=false)=>{
     let success = true;
     const {
-        name
+        name,
+        subCategoryId
     } = info;
     //console.log('propertyName: ',name);
-    if(name){
+    if(final && subCategoryId<1){
+        success = false;
+        dispatch(createError('propertyName','زیر دسته انتخاب نشده است'));    
+    }
+    else if(name){
         if(name.replace(" ","").length == 0){
             success = false;
             dispatch(createError('propertyName','نام ویژگی نمی تواند خالی باشد'));    
@@ -590,9 +598,12 @@ const checkPropertyInfo = (info,dispatch)=>{
             dispatch(cleanError('propertyName'));
         }
     }
-    else{
+    else if(final){
         success = false;
         dispatch(createError('propertyName','نام ویژگی نمی تواند خالی باشد'));  
+    }
+    else{
+        dispatch(cleanError('propertyName'));
     }
 
     return success;  
