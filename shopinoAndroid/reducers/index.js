@@ -94,19 +94,25 @@ export const message = (state={},action)=>{
 }
 
 export const newCategory=(state={},action)=>{
-    if(action.type === C.CHANGE_NEW_CATEGORY){
-        return Object.assign({},state,action.payload);
+    switch(action.type){
+        case C.CHANGE_NEW_CATEGORY:
+            return Object.assign({},state,action.payload);
+        case C.CLEAN_NEW_CATEGORY:
+            return {};
+        default:
+            return state;
     }
-    else
-        return state;
 }
 
 export const newSubCategory=(state={},action)=>{
-    if(action.type === C.CHANGE_NEW_SUB_CATEGORY){
-        return Object.assign({},state,action.payload);
+    switch(action.type){
+        case C.CHANGE_NEW_SUB_CATEGORY:
+            return Object.assign({},state,action.payload);
+        case C.CLEAN_NEW_SUB_CATEGORY:
+            return {};
+        default:
+            return state;
     }
-    else
-        return state;
 }
 
 export const categories = (state=[],action)=>{

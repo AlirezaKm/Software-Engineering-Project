@@ -40,9 +40,9 @@ export const changeNewUser = (info)=>(dispatch,getState)=>{
     return checkUserInfo(getState().newUser,dispatch)
 }
 
-const cleanNewUser = ()=>({
+export const cleanNewUser = ()=>({
     type:C.CLEAN_NEW_USER
-})
+});
 
 const checkUserInfo = (info, dispatch, final = false)=>{
     let success = true;

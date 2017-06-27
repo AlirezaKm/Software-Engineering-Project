@@ -3,7 +3,7 @@ import {Container,Content,Fab,Icon,Picker,Item,Button} from 'native-base'
 import {connect} from 'react-redux'
 import {Text,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
-import {changeNewUser,addUser} from '../../actions/Users'
+import {changeNewUser,addUser,cleanNewUser} from '../../actions/Users'
 import {cleanAllError} from '../../actions'
 class CreateUser extends Component{
     static navigationOptions={
@@ -31,7 +31,7 @@ class CreateUser extends Component{
         this.changeSelectedType(this.state.selectedType);
     }
     componentWillUnmount(){
-        this.props.cleanErrors();
+        this.props.clean();
     }
     render(){
         const {wait,createUser,error,message} = this.props;
@@ -119,8 +119,9 @@ const mapDispatchToProps = (dispatch)=>({
     createUser:()=>{
         dispatch(addUser());
     },
-    cleanErrors:()=>{
+    clean:()=>{
         dispatch(cleanAllError());
+        dispatch(cleanNewUser());
     }
 })
 export default connect(mapStateToProps,mapDispatchToProps)(CreateUser);

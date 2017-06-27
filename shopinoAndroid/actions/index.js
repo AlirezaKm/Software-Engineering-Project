@@ -77,6 +77,79 @@ export const cleanMessage = (field)=>{
     return createMessage(field,null);
 };
 
+//   ------------------ factors ------------------
+
+export const addFactor = () =>(dispatch,getState) =>{
+    if(checkFactorInfo(getState().newFactor,dispatch,true)){
+        dispatch({
+            type:C.ADD_FACTOR,
+            payload:getState().newFactor
+        })
+        dispatch(createMessage('factor','فاکتور ایجاد شد'));
+        dispatch({
+            type:C.CHANGE_NEW_FACTOR,
+            payload:{
+                id:getState().factors[getState().factors.length-1].id
+            }
+        })
+    }
+};
+
+export const changeNewFactor = (factorInfo)=> (dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_FACTOR,
+        payload:{
+            ...factorInfo
+        }
+    });
+    checkFactorInfo(getState().newFactor,dispatch);
+}
+
+
+const checkFactorInfo = (info,dispatch,final = false)=>{
+    let success = true;
+    const {
+        seller,
+        date
+    } = info;
+
+    if(seller){
+        if(seller.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
+        }
+        else{
+            dispatch(cleanError('seller'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
+    }
+    
+    if(date){
+        if(seller.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('date','تاریخ انتخاب نشده است'));    
+        }
+        else{
+            dispatch(cleanError('date'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('date','تاریخ انتخاب نشده است')); 
+    }
+
+    return success;
+}
+
+export const changeSelectedFactor = (factorId)=>({
+    type:C.CHANGE_SELECTED_FACTOR,
+    payload:factorId
+ });
+
+
 //   ------------------ categories ------------------
 export const loadCategories = ()=>(dispatch,getState)=>{
     dispatch({
@@ -91,18 +164,10 @@ export const loadCategories = ()=>(dispatch,getState)=>{
 }
 
 export const addCategory = ()=>(dispatch,getState) =>{
-    if(checkCategoryInfo(getState().newCategory,dispatch,true)){
-        dispatch({
-            type:C.ADD_CATEGORY,
-            payload:getState().newCategory
-        })
+    const newCategory = getState().newCategory;
+    if(checkCategoryInfo(newCategory,dispatch,true)){
+        post(urls.categories,)
         dispatch(createMessage('category','دسته ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_CATEGORY,
-            payload:{
-                id:getState().categories[getState().categories.length-1].id
-            }
-        })
     }
 };
 
@@ -120,6 +185,40 @@ export const changeSelectedCategory = (categoryId)=>(dispatch)=>{
         payload:categoryId
     });
 };
+
+export const changeNewCategory = (categoryInfo)=> (dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_CATEGORY,
+        payload:{
+            ...categoryInfo
+        }
+    });
+    checkCategoryInfo(getState().newCategory,dispatch);
+}
+
+const checkCategoryInfo = (info,dispatch,final = false)=>{
+    let success = true;
+    const {
+        name,        
+    } = info;
+
+    if(name){
+        if(name.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));    
+        }
+        else{
+            dispatch(cleanError('categoryName'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));  
+    }
+
+    return success;  
+}
+
 
 
 //   ------------------- subcategories -------------------
@@ -169,16 +268,46 @@ export const changeSelectedSubCategory = (subCategoryId)=>({
     payload:subCategoryId
 });
 
+export const changeNewSubCategory = (subCategoryInfo)=> (dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_SUB_CATEGORY,
+        payload:{
+            ...subCategoryInfo
+        }
+    });
+    checkSubCategoryInfo(getState().newSubCategory,dispatch);
+}
 
+const checkSubCategoryInfo = (info,dispatch,final = false)=>{
+    let success = true;
+    const {
+        name,        
+    } = info;
+
+    if(name){
+        if(name.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));    
+        }
+        else{
+            dispatch(cleanError('subCategoryName'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));  
+    }
+
+    return success;  
+}
+
+//
 export const changeSelectedOrderFactor = (orderFactorId)=>({
     type:C.CHANGE_SELECTED_ORDER_FACTOR,
     payload:orderFactorId
  });
 
-export const changeSelectedFactor = (factorId)=>({
-    type:C.CHANGE_SELECTED_FACTOR,
-    payload:factorId
- });
+
 
 export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
     dispatch({
@@ -409,137 +538,7 @@ const checkProductInfo = (info,dispatch, final = false)=>{
     return success;
 }
 
-export const addFactor = () =>(dispatch,getState) =>{
-    if(checkFactorInfo(getState().newFactor,dispatch,true)){
-        dispatch({
-            type:C.ADD_FACTOR,
-            payload:getState().newFactor
-        })
-        dispatch(createMessage('factor','فاکتور ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_FACTOR,
-            payload:{
-                id:getState().factors[getState().factors.length-1].id
-            }
-        })
-    }
-};
 
-export const changeNewCategory = (categoryInfo)=> (dispatch,getState)=>{
-    dispatch({
-        type:C.CHANGE_NEW_CATEGORY,
-        payload:{
-            ...categoryInfo
-        }
-    });
-    checkCategoryInfo(getState().newCategory,dispatch);
-}
-
-const checkCategoryInfo = (info,dispatch,final = false)=>{
-    let success = true;
-    const {
-        name,        
-    } = info;
-
-    if(name){
-        if(name.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));    
-        }
-        else{
-            dispatch(cleanError('categoryName'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));  
-    }
-
-    return success;  
-}
-
-export const changeNewSubCategory = (subCategoryInfo)=> (dispatch,getState)=>{
-    dispatch({
-        type:C.CHANGE_NEW_SUB_CATEGORY,
-        payload:{
-            ...subCategoryInfo
-        }
-    });
-    checkSubCategoryInfo(getState().newSubCategory,dispatch);
-}
-
-const checkSubCategoryInfo = (info,dispatch,final = false)=>{
-    let success = true;
-    const {
-        name,        
-    } = info;
-
-    if(name){
-        if(name.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));    
-        }
-        else{
-            dispatch(cleanError('subCategoryName'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));  
-    }
-
-    return success;  
-}
-
-export const changeNewFactor = (factorInfo)=> (dispatch,getState)=>{
-    dispatch({
-        type:C.CHANGE_NEW_FACTOR,
-        payload:{
-            ...factorInfo
-        }
-    });
-    checkFactorInfo(getState().newFactor,dispatch);
-}
-
-
-
-const checkFactorInfo = (info,dispatch,final = false)=>{
-    let success = true;
-    const {
-        seller,
-        date
-    } = info;
-
-    if(seller){
-        if(seller.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
-        }
-        else{
-            dispatch(cleanError('seller'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
-    }
-    
-    if(date){
-        if(seller.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('date','تاریخ انتخاب نشده است'));    
-        }
-        else{
-            dispatch(cleanError('date'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('date','تاریخ انتخاب نشده است')); 
-    }
-
-    return success;
-}
 
 export const addProperty = () =>(dispatch,getState) =>{
     console.log('addProperty:start');
