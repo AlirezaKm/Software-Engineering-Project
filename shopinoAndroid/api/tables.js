@@ -1,3 +1,6 @@
 export default  tables = {
-    users:'users'
+    users:'users',
+    factors:'factors',
+    categories:'categories',
+    subcategories:'subCategories'
 }

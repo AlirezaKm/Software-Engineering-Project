@@ -1,5 +1,6 @@
 import C from './constants'
-
+import {get,post} from '../api'
+import urls from '../api/tables'
 /*const navigateAction = NavigationActions.navigate({
   routeName: 'Profile'
 });*/
@@ -8,12 +9,7 @@ import C from './constants'
 export const setNavigate = (navigate) =>({
     type:C.SET_NAVIGATE,
     payload:navigate
-})
-
-export const loadInfo = (tableName,dispatch)=>{
-    get(tableName,dispatch);
-}
-
+});
 
 export const login = (username,password)=> (dispatch,getState)=> {
     //sendRequest(dispatch);
@@ -62,15 +58,12 @@ export const createError = (field,message)=>{
         payload:error
     }
 };
+export const cleanError = (field)=>
+    createError(field,null);
 
-export const cleanError = (field)=>{
-    let error={};
-    error[field] = null;
-    return {
-        type:C.CHANGE_ERROR,
-        payload:error
-    }
-};
+export const cleanAllError = ()=>({
+    type:C.CLEAN_ERROR
+})
 
 export const createMessage = (field,message)=>{
     let msg={};
@@ -80,10 +73,22 @@ export const createMessage = (field,message)=>{
         payload:msg
     }
 };
-
 export const cleanMessage = (field)=>{
     return createMessage(field,null);
 };
+
+//   ------------------ categories ------------------
+export const loadCategories = ()=>(dispatch,getState)=>{
+    dispatch({
+        type:C.SEND_REQUEST_CATEGORIES
+    })
+    get(urls.categories,dispatch,()=>{
+        console.log('categories loaded');
+        dispatch({
+            type:C.RECEIVE_RESPONE_CATEGORIES
+        });
+    });
+}
 
 export const addCategory = ()=>(dispatch,getState) =>{
     if(checkCategoryInfo(getState().newCategory,dispatch,true)){
@@ -108,6 +113,28 @@ export const editCategory = (id,name)=>({
         name:name
     }
 });
+export const changeSelectedCategory = (categoryId)=>(dispatch)=>{
+    dispatch(loadSubCategories(categoryId));
+    dispatch({
+        type:C.CHANGE_SELECTED_CATEGORY,
+        payload:categoryId
+    });
+};
+
+
+//   ------------------- subcategories -------------------
+export const loadSubCategories = (categoryId)=>(dispatch)=>{
+    dispatch({
+        type:C.SEND_REQUEST_SUBCATEGORIES
+    });
+    const url = urls.subcategories;
+    const parameters = "?categoryId="+categoryId;
+    get(url,dispatch,()=>{
+        dispatch({
+            type:C.RECEIVE_RESPONE_SUBCATEGORIES
+        })
+    },parameters);
+}
 
 export const addSubCategory = ()=>(dispatch,getState) =>{
     if(checkSubCategoryInfo(getState().newSubCategory,dispatch,true)){
@@ -129,7 +156,6 @@ export const addSubCategory = ()=>(dispatch,getState) =>{
         })
     }
 };
-
 export const editSubCategory = (id,categoryId,name)=>({
     type:C.EDIT_SUB_CATEGORY,
     payload:{
@@ -138,16 +164,11 @@ export const editSubCategory = (id,categoryId,name)=>({
         name:name
     }
 });
-
-export const changeSelectedCategory = (categoryId)=>({
-    type:C.CHANGE_SELECTED_CATEGORY,
-    payload:categoryId
-});
-
 export const changeSelectedSubCategory = (subCategoryId)=>({
     type:C.CHANGE_SELECTED_SUB_CATEGORY,
     payload:subCategoryId
 });
+
 
 export const changeSelectedOrderFactor = (orderFactorId)=>({
     type:C.CHANGE_SELECTED_ORDER_FACTOR,

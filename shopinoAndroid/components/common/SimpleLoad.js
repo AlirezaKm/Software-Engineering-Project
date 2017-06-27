@@ -3,10 +3,10 @@ import {Content,Spinner,Button,Icon,View} from 'native-base'
 import Text from './Text'
 import {colors} from '../styles'
 
-const Load=({wait,children})=>(
+const SimpleLoad=({wait,children})=>(
     <View style={{alignItems:'center'}}>
         {wait?<Spinner size="large" color={colors.accent}/>:children}
     </View>
     );
 
-export default Load
+export default SimpleLoad

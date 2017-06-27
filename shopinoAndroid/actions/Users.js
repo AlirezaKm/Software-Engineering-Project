@@ -1,5 +1,5 @@
 import C from './constants'
-import {createMessage,createError,cleanError} from './index'
+import {createMessage,createError,cleanError,cleanAllError} from './index'
 import {sendMessage} from './helper'
 import urls from '../api/tables'
 import {get,post} from '../api'
@@ -11,7 +11,7 @@ export const loadUsers = ()=>(dispatch)=>{
 export const addUser = ()=>(dispatch,getState)=>{
     const newUser = getState().newUser;
     if(checkUserInfo(newUser,dispatch,true)){
-        newUser.repassword = null;
+        delete newUser.repassword;
         console.log('addUser:valid');
         const date = new Date();
         const parameters = {
@@ -19,13 +19,13 @@ export const addUser = ()=>(dispatch,getState)=>{
             created_at:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
         };
         post(urls.users,parameters,dispatch,
-        (wired,err,data)=>{
+        (err,data)=>{
             if(err){
                 return console.log('addUser:post:callback:err:',err,data);
             }
-            console.log('addUser:post:callback:',wired,';',err,':',data);
+            console.log('addUser:post:callback:',err,':',data);
             //getState().navigation.goBack('CreateUser');
-
+            dispatch(loadUsers());
             sendMessage(urls.users,'کاربر با موفقیت اضافه شد',dispatch);
         });
         dispatch(cleanNewUser());

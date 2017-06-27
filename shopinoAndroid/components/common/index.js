@@ -9,7 +9,7 @@ import ErrorMessage from './ErrorMessage'
 import CardRow from './CardRow'
 import Field from './Field'
 import Load from './Load'
-import ButtonLoad from './ButtonLoad'
+import SimpleLoad from './SimpleLoad'
 
 module.exports= {
     ErrorMessage,
@@ -23,5 +23,5 @@ module.exports= {
     Modal,
     CardRow,
     Load,
-    ButtonLoad
+    SimpleLoad
 }

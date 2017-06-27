@@ -50,13 +50,13 @@ class Users extends Component{
         const usersViews = users.map(user =>{
             let type = "مدیر";
             switch(user.type){
-                case 2:
-                    type = "فروشنده";
+                case "2":
+                    type = "انباردار";
                     break;
-                case 3:
+                case "3":
                     type = "حسابدار";
                     break;
-                case 4:
+                case "4":
                     type = "فروشنده";
                     break;
             }

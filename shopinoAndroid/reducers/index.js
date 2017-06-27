@@ -30,6 +30,38 @@ export const waitForResponse = (state=false,action)=>{
     }
 }
 
+export const loadingCategories = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_CATEGORIES:            
+            return true;        
+        case C.RECEIVE_RESPONE_CATEGORIES:            
+            return false;
+        default:
+            return state;
+    }
+}
+export const loadingSubCategories = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_SUBCATEGORIES:            
+            return true;        
+        case C.RECEIVE_RESPONE_SUBCATEGORIES:            
+            return false;
+        default:
+            return state;
+    }
+}
+
+export const loadingFactors = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_FACTORS:            
+            return true;        
+        case C.RECEIVE_RESPONE_FACTORS:            
+            return false;
+        default:
+            return state;
+    }
+}
+
 export const userInfo = (state={},action)=>{
     switch(action.type){
         case C.CHANGE_USER_INFO:
@@ -110,6 +142,8 @@ export const categories = (state=[],action)=>{
                     name:name
                 }
             ]
+        case C.LOAD_CATEGORIES:
+            return action.payload;
         default:
             return state;
     }
@@ -152,6 +186,8 @@ export const subCategories = (state=[],action)=>{
                     name:name
                 }
             ]
+        case C.LOAD_SUBCATEGORIES:
+            return action.payload;
         default:
             return state;
     }
@@ -551,6 +587,9 @@ const newOrders = (state = [],action)=>{
 export default combineReducers({
     navigation,
     waitForResponse,
+    loadingCategories,
+    loadingSubCategories,
+    loadingFactors,
     userInfo,
     error,
     newCategory,

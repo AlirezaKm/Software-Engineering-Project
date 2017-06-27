@@ -1,9 +1,10 @@
 import React,{Component} from 'react'
 import {Container,Content,Fab,Icon,Picker,Item,Button} from 'native-base'
 import {connect} from 'react-redux'
-import {Text,Field,ButtonLoad} from '../common'
+import {Text,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import {changeNewUser,addUser} from '../../actions/Users'
+import {cleanAllError} from '../../actions'
 class CreateUser extends Component{
     static navigationOptions={
         title:'اضافه کردن کاربر'
@@ -26,14 +27,17 @@ class CreateUser extends Component{
         });
         this.changeUserInfo('type',selectedType);
     }
-    onComponentDidMount(){
+    componentDidMount(){
         this.changeSelectedType(this.state.selectedType);
+    }
+    componentWillUnmount(){
+        this.props.cleanErrors();
     }
     render(){
         const {wait,createUser,error,message} = this.props;
         console.log('CreateUser.render:wait:',wait);
         if(message){
-            setTimeout(()=>this.props.navigation.goBack(),3000);
+            setTimeout(()=>this.props.navigation.goBack(),2000);
         }
         return (
             <Container style={{backgroundColor:'white'}}>
@@ -92,12 +96,12 @@ class CreateUser extends Component{
                         </Picker>
                     </Field>
                 </Content>
-                <ButtonLoad wait={wait}>
-                    <Button block style={{backgroundColor:colors.accent}} 
+                <SimpleLoad wait={wait}>
+                    <Button block style={{backgroundColor:colors.accent}} disabled={message&&true}
                         onPress={()=>createUser()}> 
                         <Text big> ثبت! </Text>
                     </Button>
-                </ButtonLoad>
+                </SimpleLoad>
             </Container>
         )
     }
@@ -114,6 +118,9 @@ const mapDispatchToProps = (dispatch)=>({
     },
     createUser:()=>{
         dispatch(addUser());
+    },
+    cleanErrors:()=>{
+        dispatch(cleanAllError());
     }
 })
 export default connect(mapStateToProps,mapDispatchToProps)(CreateUser);
