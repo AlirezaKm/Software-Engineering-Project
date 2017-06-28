@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateProductAPIRequest;
 use App\Http\Requests\API\UpdateProductAPIRequest;
 use App\Models\Product;
+use App\Models\ProductProperty;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -77,7 +79,7 @@ class ProductAPIController extends AppBaseController
             }
             if($request->has('page') && is_numeric($request->input('page'))){
                 $page = $request->input('page') > 1 ? $request->input('page') : 1;
-                $products = $products->offset(($page - 1)*$SizeOfPage+1);
+                $products = $products->offset(($page - 1)*$SizeOfPage);
             }else{
                 $products = $products->offset(0);
             }
@@ -92,6 +94,10 @@ class ProductAPIController extends AppBaseController
             if($request->has('name')){
                 $name = $request->input('name');
                 $products = $products->where('name',$name);
+            }
+            if($request->has('factor')){
+                $factor = $request->input('factor');
+                $products = $products->where('factor',$factor);
             }
         }
         $products = $products->get();
@@ -138,11 +144,23 @@ class ProductAPIController extends AppBaseController
      */
     public function store(CreateProductAPIRequest $request)
     {
-        $input = $request->all();
-
-        $products = $this->productRepository->create($input);
-
-        return $this->sendResponse($products->toArray(), 'Product saved successfully');
+        $productInfo = $request->except('productPropertise');
+        $product = $this->productRepository->create($productInfo);
+        if($productInfo === null){
+            return $this->sendError('Product Not Craeted!');
+        }
+        if($request->has('productPropertise')){
+            $productProperties = $request->only('productPropertise');
+            $pp = $productProperties['productPropertise'];
+            if($pp !== null){
+                for ($i = 0 ; $i < count($pp) ; $i++){
+                    $pp[$i] += array('product' => $product->code);
+                }
+            }
+            // Here insert ProductProperty
+            DB::table('ProductProperty')->insert($pp);
+        }
+        return $this->sendResponse($request->all(), 'Product saved successfully');
     }
 
     /**
@@ -186,12 +204,12 @@ class ProductAPIController extends AppBaseController
     public function show($id)
     {
         /** @var Product $product */
-        $product = $this->productRepository->findWithoutFail($id);
-
+        //$product = $this->productRepository->findWithoutFail($id);
+        $products = Product::with('category','subcategory','factor');
+        $product = $products->find($id);
         if (empty($product)) {
             return $this->sendError('Product not found');
         }
-
         return $this->sendResponse($product->toArray(), 'Product retrieved successfully');
     }
 
