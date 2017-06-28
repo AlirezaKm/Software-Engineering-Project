@@ -93,10 +93,13 @@ export const loadFactors = (page=1)=>(dispatch)=>{
 
 export const addFactor = () =>(dispatch,getState) =>{
     const newFactor = getState().newFactor;
+    console.log('addFactor:newFactor:',newFactor);
     if(checkFactorInfo(newFactor,dispatch,true)){
-        post(urls.factors,newFactor,dispatch,()=>{
-            sendMessage('factor','فاکتور ایجاد شد',dispatch);
+        newFactor.seller = 1;
+        post(urls.factors,newFactor,dispatch,(err,data)=>{
+            console.log('addFactor:callback:',data);
             dispatch(loadFactors());
+            sendMessage('factors','فاکتور ایجاد شد',dispatch);
         })
     }
 };
@@ -243,7 +246,7 @@ export const loadSubCategories = (categoryId)=>(dispatch)=>{
         type:C.SEND_REQUEST_SUBCATEGORIES
     });
     const url = urls.subcategories;
-    const parameters = "?categoryId="+categoryId;
+    const parameters = "?category="+categoryId;
     get(url,dispatch,()=>{
         dispatch({
             type:C.RECEIVE_RESPONE_SUBCATEGORIES
@@ -256,7 +259,7 @@ export const addSubCategory = ()=>(dispatch,getState) =>{
     if(checkSubCategoryInfo(newSubCategory,dispatch,true)){
         const selectedCategory = getState().selectedCategory;
         post(urls.subcategories,{
-            categoryId:selectedCategory,
+            category:selectedCategory,
             ...getState().newSubCategory
         },dispatch,()=>{
             dispatch(loadSubCategories(selectedCategory));
@@ -273,8 +276,8 @@ export const editSubCategory = (id,categoryId,name)=>({
     }
 });
 export const changeSelectedSubCategory = (subCategoryId)=>(dispatch,getState)=>{
-    dispatch(loadProperties(subCategoryId));
     if(subCategoryId >= 1){
+        dispatch(loadProperties(subCategoryId));
         checkPropertyInfo(getState().newProperty,dispatch);
     }
     dispatch({
@@ -320,12 +323,18 @@ export const cleanNewSubCategory = ()=>({
     type:C.CLEAN_NEW_SUB_CATEGORY
 });
 
-//
+//  OrderFactors
 export const changeSelectedOrderFactor = (orderFactorId)=>({
     type:C.CHANGE_SELECTED_ORDER_FACTOR,
     payload:orderFactorId
  });
 
+export const loadOrderFactors = ()=>(dispatch)=>{
+     get(urls.orderFactors,dispatch);
+ }
+export const loadOrders = (orderFactorId)=>(dispatch)=>{
+    get(urls.orders,dispatch,null,"?orderFactor="+orderFactorId);
+}
 export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
     dispatch({
         type:C.CHANGE_SELECTED_PRODUCT,
@@ -344,43 +353,32 @@ export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
         if(item.productCode == productCode){
             console.log('add new Product property for selected product');
             dispatch(addNewProductProperty({
-                productCode:productCode,
-                propertyId:item.propertyId,
+                product:productCode,
+                property:item.propertyId,
                 value:item.value
             }));      
         }
     });
 };
-export const loadProducts = (page)=>(dispatch)=>{
-    get(urls.products,dispatch);
+export const loadProducts = (page,factorId)=>(dispatch)=>{
+    get(urls.products,dispatch,null,factorId?"?factor="+factorId:'');
 }
 export const addProduct = () =>(dispatch,getState) =>{
-    const newProduct = getState().newProduct;
+    let newProduct = getState().newProduct;
     if(checkProductInfo(newProduct,dispatch,true)){
         if(newProduct.code){//edit 
         }
         else{//add New
-            const productCode = getState().products[getState().products.length-1].code;
-            const date = new Date();
-            const parameters ={
-                code:productCode,
-                newProduct,
-                /*factor:getState().factors.find(item=>item.id == newProduct.factorId),
-                name:newProduct.name,
-                category:getState().categories.find(item=>item.id == newProduct.categoryId),
-                subCategory:getState().subCategories.find(item=>item.id == newProduct.subCategoryId),
-                count:newProduct.count,
-                sellPrice: newProduct.sellPrice,
-                buyPrice: newProduct.buyPrice,*/
-                created_at:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
-            };
-            console.log('addProduct:parameters:',parameters);
-            post(urls.products,parameters,dispatch,(err,data)=>{
+            newProduct = {
+                ...newProduct,
+                productProperties:JSON.stringify(getState().newProductProperty)
+            }
+            console.log('newProduct:',newProduct);
+            console.log('addProduct:post:parameters:',newProduct);
+            post(urls.products,newProduct,dispatch,(err,data)=>{
                 dispatch(loadProducts());
                 sendMessage('products','محصول ایجاد شد',dispatch);
             });
-
-            //add Product Properties
         }
     }
 };
@@ -437,9 +435,9 @@ const checkProductInfo = (info,dispatch, final = false)=>{
     }
     const {
         name,
-        factorId,
-        categoryId,
-        subCategoryId,
+        factor,
+        category,
+        subcategory,
         count,
         buyPrice,
         sellPrice
@@ -458,8 +456,8 @@ const checkProductInfo = (info,dispatch, final = false)=>{
         err('name','نام نمی تواند خالی باشد');    
     }
 
-    if(factorId){
-        if(factorId < 0){
+    if(factor){
+        if(factor < 0){
             err('factorId','فاکتور باید انتخاب شود');    
         }
         else{
@@ -470,8 +468,8 @@ const checkProductInfo = (info,dispatch, final = false)=>{
         err('factorId','فاکتور باید انتخاب شود');    
     }
 
-    if(categoryId){
-        if(categoryId < 0){            
+    if(category){
+        if(category < 0){            
             err('categoryId','دسته باید انتخاب شود');    
         }
         else{
@@ -482,8 +480,8 @@ const checkProductInfo = (info,dispatch, final = false)=>{
         err('categoryId','دسته باید انتخاب شود');    
     }
 
-    if(subCategoryId){
-        if(subCategoryId < 0){
+    if(subcategory){
+        if(subcategory < 0){
             err('subCategoryId','زیر دسته باید انتخاب شود');    
         }
         else{
@@ -544,7 +542,7 @@ export const loadProperties = (subCategoryId)=>(dispatch)=>{
     });
     const url = urls.properties;
     
-    const parameters = "?subCategoryId="+subCategoryId;
+    const parameters = "?subCategory="+subCategoryId;
 
     console.log('loadProperties:url:',url,parameters);
     get(url,dispatch,()=>{
@@ -558,7 +556,7 @@ export const addProperty = () =>(dispatch,getState) =>{
     const selectedSubCategory = getState().selectedSubCategory;
     const newProperty={
         ...getState().newProperty,
-        subCategoryId:selectedSubCategory
+        subcategory:selectedSubCategory
     }
     if(checkPropertyInfo(newProperty,dispatch,true)){
         post(urls.properties,newProperty,dispatch,()=>{

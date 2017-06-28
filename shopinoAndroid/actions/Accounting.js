@@ -1,14 +1,15 @@
 import C from './constants'
 import {createError,cleanError,createMessage} from './index'
-
+import {get,post} from '../api'
+import {sendMessage} from './helper'
+import urls from '../api/tables'
 export const addExpense = ()=>(dispatch,getState)=>{
     const newExpense = getState().newExpense;
     if(checkExpenseInfo(newExpense,dispatch,true)){
-        dispatch({
-            type:C.ADD_EXPENSE,
-            payload:newExpense
+        post(urls.expenses,newExpense,dispatch,()=>{
+            dispatch(loadExpenses());
+            sendMessage('expenses','خرج ایجاد شد',dispatch);
         });
-        dispatch(clean(C.CLEAN_NEW_EXPENSE));
     }
 }
 export const changeNewExpense = (info)=>(dispatch,getState)=>{
@@ -18,6 +19,10 @@ export const changeNewExpense = (info)=>(dispatch,getState)=>{
     });
     checkExpenseInfo(getState().newExpense,dispatch);
 }
+
+export const loadExpenses = ()=>(dispatch)=>{
+    get(urls.expenses,dispatch);
+};
 
 const clean = type=>({
     type:type
@@ -46,17 +51,17 @@ const validate = (info , config, dispatch, required)=>{
         console.log('clean err:  Information: ',field);
         dispatch(cleanError(field));
     }
-    console.log('validate Information: ',info);
 
-    for(var prop in info){        
-        if (info.hasOwnProperty(prop)){            
+    for(var prop in config){        
+        if (config.hasOwnProperty(prop)){            
             const rules = config[prop];
             if(rules){
                 const parse = parseInt(info[prop]);
-
-                if(rules.required && (!info[prop] || info[prop].replace(" ","").length == 0)){
-                    if(required)
+                const f = rules.required;
+                if(rules.required && ( !info[prop] || info[prop].replace(" ","").length == 0)){
+                    if(required){
                         err(prop,rules.name+' '+'نمی تواند خالی باشد');
+                    }
                 }
                 else if(rules.number && !parse){
                     err(prop,rules.name+' '+'فقط باید شامل اعداد باشد');
@@ -70,3 +75,7 @@ const validate = (info , config, dispatch, required)=>{
 
     return success;
 }
+
+export const cleanNewExpense = ()=>({
+    type:C.CLEAN_NEW_EXPENSE
+})

@@ -70,7 +70,7 @@ class MainDetail extends Component{
             this.setState({
                 selectedFactor:value
             },
-            ()=>this.changeProductInfo('factorId',this.state.selectedFactor)
+            ()=>this.changeProductInfo('factor',this.state.selectedFactor)
             );
         }
     }
@@ -81,7 +81,7 @@ class MainDetail extends Component{
             this.setState({
                 selectedCategory:value
             },()=>
-                this.changeProductInfo('categoryId',this.state.selectedCategory)
+                this.changeProductInfo('category',this.state.selectedCategory)
             );
         }
     } 
@@ -93,7 +93,7 @@ class MainDetail extends Component{
             this.setState({
                 selectedSubCategory:value
             },()=>
-                this.changeProductInfo('subCategoryId',this.state.selectedSubCategory)
+                this.changeProductInfo('subcategory',this.state.selectedSubCategory)
             );
         }
     }
@@ -116,7 +116,7 @@ class MainDetail extends Component{
         const factorItems = [
             chooseItem,
             ...factors.map((item,index)=>
-            <Item label={''+ item.seller +' '+ item.date.year+'/'+item.date.month+'/'+item.date.day} value={item.id} key={index}/>)
+            <Item label={''+ item.seller.name +' '+ item.date} value={item.id} key={index}/>)
         ];
 
         const categoryItems=[
@@ -212,7 +212,7 @@ class MainDetail extends Component{
                                         this.setModalVisible('subCategoryModal',true)
                                     }
                                     else{
-                                        this.changeProductInfo('categoryId',-1);
+                                        this.changeProductInfo('category',-1);
                                     }
                                 }}>
                                 <Icon name="add-circle" style={{color:colors.accent}}/>

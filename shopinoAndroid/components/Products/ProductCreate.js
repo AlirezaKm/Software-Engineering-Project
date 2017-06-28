@@ -1,7 +1,7 @@
 import React,{Component} from 'react'
 import {Container,Footer,FooterTab,Button} from 'native-base'
 import {connect} from 'react-redux'
-import {Text} from '../common'
+import {Text,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import {TabNavigator} from 'react-navigation'
 import MainDetail from './MainDetail'
@@ -37,29 +37,45 @@ class ProductCreate extends Component{
         this.props.cleanProduct();
     }
     render(){
-        const {createProduct} = this.props;
+        const {wait,error,message,createProduct,navigation} = this.props;
+        if(message){
+            setTimeout(()=>{
+                navigation.goBack();
+            },1000)
+        }
         return(
             <Container>
+                {message&&<Text success background> {message} </Text>}
+                {error&& <Text error>{error}</Text>}
                 <Tabs/>
-                <Footer>
-                    <FooterTab>
-                        <Button style={{backgroundColor:colors.accent}} 
-                            onPress={()=>createProduct()}>
-                            <Text white big> ثبت! </Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>
+                <SimpleLoad wait={wait}> 
+                    <Footer>
+                        <FooterTab> 
+                                <Button style={{backgroundColor:colors.accent}} 
+                                    onPress={()=>createProduct()}>
+                                    <Text white big> ثبت! </Text>
+                                </Button>
+                        </FooterTab>
+                    </Footer>
+                </SimpleLoad>
             </Container>
         )
     }
 }
 
+const mapStateToProps = (state,ownProps)=>({
+    wait:state.waitForResponse,
+    error:state.error.products,
+    message:state.message.products
+})
 const mapDispatchToProps=(dispatch,ownProps)=>({
     createProduct:()=>{
         dispatch(addProduct());
     },
     cleanProduct:()=>{
         dispatch(cleanNewProduct());
+        //clean Err
+        //dispatch();
     }
 });
-export default connect(null,mapDispatchToProps)(ProductCreate);
+export default connect(mapStateToProps,mapDispatchToProps)(ProductCreate);

@@ -20,7 +20,10 @@ const MyText = ({children,style,active,white,secondary,small,big,error,center,pa
         extraStyle.fontSize=18;
     }
     if(error){
-        extraStyle.color=colors.negative;
+        extraStyle.color= "white";
+        extraStyle.padding=8;
+        extraStyle.backgroundColor = colors.negative;
+        extraStyle.textAlign="center";
     }
     if(success && background){
         extraStyle.color= "white";

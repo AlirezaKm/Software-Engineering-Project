@@ -1,26 +1,40 @@
 import React,{Component} from 'react'
 import {Button} from 'native-base'
-import {Text,Card,CardItem,Field} from '../common'
+import {Text,Card,CardItem,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import Modal from '../Modal'
 import {connect} from 'react-redux'
-import {changeNewExpense,addExpense} from '../../actions/Accounting'
-
+import {changeNewExpense,addExpense,cleanNewExpense} from '../../actions/Accounting'
+import {cleanError} from '../../actions'
 class ExpenseModal extends Component{ 
     render(){
         const {
+            wait,
             visible,
             setVisible,
             error,
             changeExpense,
-            createExpense
+            createExpense,
+            message,
+            clean
         } = this.props;
+        const onFade=()=>{
+            clean();
+        }
+        if(message){
+            setTimeout(()=>{
+                setVisible(false);
+                onFade();
+            },1000);
+        }
         return(
             <Modal
                 title="اضافه کردن خرج" 
                 visible={visible}
-                setVisible={setVisible}>
+                setVisible={setVisible}
+                onFade={onFade}>
                 <Card column>
+                    {message&&<Text success background>{message}</Text>}
                     <Field
                         icon="add"
                         label="عنوان"
@@ -38,10 +52,12 @@ class ExpenseModal extends Component{
                         onChange={({nativeEvent})=>{changeExpense('price',nativeEvent.text)}}                   
                     >
                     </Field>
-                    <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} 
-                        onPress={()=>{createExpense()}}>
-                        <Text> ثبت </Text>
-                    </Button>
+                    <SimpleLoad wait={wait}>
+                        <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} 
+                            onPress={()=>{createExpense()}}>
+                            <Text> ثبت </Text>
+                        </Button>
+                    </SimpleLoad>
                 </Card>
             </Modal>
             );
@@ -49,7 +65,9 @@ class ExpenseModal extends Component{
 }
 
 const mapStateToProps =(state,ownProps)=>({
-    error:state.error
+    wait:state.waitForResponse,
+    error:state.error,
+    message:state.message.expenses
 });
 const mapDispatchToProps = (dispatch,ownProps)=>({
     changeExpense:(field,value)=>{
@@ -59,6 +77,11 @@ const mapDispatchToProps = (dispatch,ownProps)=>({
     },
     createExpense:()=>{
         dispatch(addExpense());
+    },
+    clean:()=>{
+        dispatch(cleanNewExpense());
+        dispatch(cleanError('title'));
+        dispatch(cleanError('price'));
     }
 });
 

@@ -17,7 +17,8 @@ class Properties extends Component{
         = this.props;
 
         const propertyItems = properties.map((item,index)=>{
-            const temp = edit.find(element=> element.propertyId == item.id);
+            const temp = edit.find(element=> element.property == item.id);
+            console.log('temp:',temp);
             return(
             <Field
                 key={index}
@@ -25,11 +26,14 @@ class Properties extends Component{
                 value={temp?temp.value:null}
                 label={item.name}
                 onChange={(event)=>{
-                    addProductProperty({
-                        productCode: editCode,
-                        propertyId: item.id,
+                    let info = {
+                        property: item.id,
                         value:event.nativeEvent.text
-                    });
+                    }
+                    if(editCode){
+                        info.product = editCode;
+                    }
+                    addProductProperty(info);
                 }}
                 />
         )});
@@ -59,7 +63,7 @@ const mapStateToProps = (state,ownProps)=>({
     wait:state.waitForResponse,
     loadingProperties:state.loadingProperties,
     error:state.error,
-    properties: state.properties.filter((item)=>item.subCategoryId === state.selectedSubCategory),
+    properties: state.properties,
     edit:state.newProductProperty,
     editCode:state.newProduct.code
 });

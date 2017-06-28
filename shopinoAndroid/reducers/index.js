@@ -464,11 +464,11 @@ export const newProductProperty = (state=[],action)=>{
         case C.ADD_NEW_PRODUCT_PROPERTY:
             console.log('newProdcutProperty:',state);
             console.log('newProdcutProperty:payload: ',action.payload);
-            const exist = state.find(item=> item.propertyId === action.payload.propertyId);
+            const exist = state.find(item=> item.property === action.payload.property);
             if(exist){
                 return [
                     Object.assign({},exist,action.payload),
-                    ...state.filter(item=>(item.propertyId !== action.payload.propertyId))
+                    ...state.filter(item=>(item.property !== action.payload.property))
                 ];
             }
             else{
@@ -504,6 +504,8 @@ export const orderFactors= (state=[],action)=>{
                 console.log('orderFactor Info undefined'); // WHY ?
                 return state;
             }
+        case C.LOAD_ORDERFACTORS:
+            return action.payload;
         default:
             return state;
     }
@@ -516,6 +518,8 @@ export const orders= (state=[],action)=>{
                 ...state,
                 ...newOrders
             ];
+        case C.LOAD_ORDERS:
+            return action.payload;
         default:
             return state;
     }
@@ -537,6 +541,8 @@ const expenses = (state=[],action)=>{
                     create_date_time:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
                 }                
             ]
+        case C.LOAD_EXPENSES:
+            return action.payload;
         default:
             return state;
     }
@@ -546,10 +552,7 @@ export const newExpense = (state={},action)=>{
         case C.CHANGE_NEW_EXPENSE:
             return Object.assign({},state,action.payload);
         case C.CLEAN_NEW_EXPENSE:
-            return {
-                title:null,
-                price:null
-            }
+            return {};
         default:
             return state;
     }
@@ -566,10 +569,9 @@ const newOrderFactor = (state={},action)=>{
         case C.CLEAR_NEW_ORDER_FACTOR:
             const date = new Date();
             return {
-                "code":action.payload.code,
                 "count":0,
                 "sum":0,
-                "create_date_time":date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
+                "create_date_time":date.getDay()+'-'+date.getMonth()+1+'-'+date.getFullYear()
             }
         default:
             return state;
@@ -580,14 +582,13 @@ const newOrders = (state = [],action)=>{
         case C.ADD_NEW_ORDER:
             const newOrder= action.payload;
             let count = 0;
-            
             const exist = state.find(order=>
-                order.productCode == newOrder.productCode);
+                order.code == newOrder.code);
             
             if (exist){
                 count = exist.count +1;
                 return [
-                    ...state.filter(order=> order.productCode != newOrder.productCode),
+                    ...state.filter(order=> order.code != newOrder.code),
                     Object.assign({},exist,{count:count})
                 ]
             }

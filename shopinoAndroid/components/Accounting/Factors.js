@@ -1,13 +1,16 @@
 import React,{Component} from 'react'
 import {View} from 'native-base'
 import {connect} from 'react-redux'
-import {Text,CardRow} from '../common'
-import {changeSelectedFactor} from '../../actions'
+import {Text,CardRow,Load} from '../common'
+import {changeSelectedFactor,loadFactors} from '../../actions'
 
 class Factors extends Component {
     
+    componentWillMount(){
+        this.props.load();
+    }
     render(){
-        const {title,factors,navigate,changeFactor} = this.props;
+        const {wait,error,title,factors,navigate,changeFactor} = this.props;
         const factorViews = factors.map(({id,seller,date,count,sum})=>{
             const {day,month,year} = date;
             return (
@@ -21,31 +24,29 @@ class Factors extends Component {
                     badgeBottom={year+'/'+month+'/'+day}
                     onPress={()=>{
                         changeFactor(id);
-                        navigate('FactorDetail');
+                        navigate('FactorDetail',{factorId:id});
                     }}
             />)
         });
         return (
-            <View>                
+            <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>        
                 {factorViews}
-            </View>
+            </Load>
         )
     }
 }
-const mapStateToProps =(state,ownProps)=>{
-    const factors = state.factors.map(factor=>({
-        ...factor,
-        count:state.products.filter(product=>product.factorId === factor.id).length
-    }))
-    console.log(factors)
-    return {
-        factors:factors
-    }
-}
+const mapStateToProps =(state,ownProps)=>({
+    wait:state.waitForResponse,
+    error:state.error.factors,
+    factors:state.factors
+})
 
 const mapDispatchToProps = (dispatch,ownProps)=>({
     changeFactor:(factorId)=>{
         dispatch(changeSelectedFactor(factorId));
+    },
+    load:(page = 1)=>{
+        dispatch(loadFactors(page));
     }
 })
 

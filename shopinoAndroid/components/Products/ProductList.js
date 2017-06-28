@@ -39,8 +39,7 @@ class ProductList extends React.Component{
         const {wait,error,products,changeProduct,removeProduct} = this.props;
         const {navigate} = this.props.navigation;
         const {modalVisible,searchVisible} = this.state;
-
-        console.log(products);
+        console.log('ProductList:render:',products);
         const productList = products.map((product)=>(            
             <CardRow
                 onLongPress={()=>this.setModalVisble(true,product.code)} 
@@ -51,7 +50,7 @@ class ProductList extends React.Component{
                 title={product.name}
                 icon="pricetag"
                 ItemOne={product.category.name}
-                ItemTwo={product.subCategory.name}
+                ItemTwo={product.subcategory.name}
                 badgeTop={product.sellPrice+" تومان"}
                 badgeBottom={product.count+" عدد"}/>
         ));

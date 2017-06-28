@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Container,Content,Button,View,Icon,Toast} from 'native-base'
 import {connect} from 'react-redux'
-import { Text,Field,CardRow,Row} from '../common'
+import { Text,Field,CardRow,Row,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import * as actions from '../../actions/Selling'
 import {cleanError} from '../../actions'
@@ -35,31 +35,22 @@ class Selling extends Component {
     }
     render() {
         
-        const {orderFactor,orders,error,clearError} = this.props;        
+        const {wait,message,orderFactor,orders,error,clearError} = this.props;        
         const orderViews = orders.map(order =>
             <CardRow
                 key={order.code}
                 icon="pricetag"
                 title={order.name}
-                ItemOne={order.category}
-                ItemTwo={order.subCategory}
-                badgeTop={order.buyPrice+' تومان'}
+                ItemOne={order.category.name}
+                ItemTwo={order.subcategory.name}
+                badgeTop={order.sellPrice+' تومان'}
                 badgeBottom={order.count+' عدد'}
             />);
-
-        if(error){
-            Toast.show({
-                text:error,
-                buttonText:'باشه!',
-                position:'bottom',
-                type:'warning',
-                duration:3000
-            });
-            clearError('selling');
-        }
         
         return (
             <Container>
+                {message&&<Text success background>{message}</Text>}
+                {error&&<Text error> {error} </Text>}
                 <Row spaceAround style={{backgroundColor:colors.darkPrimary}}>
                     <View>
                         <Text white center>تعداد</Text>
@@ -75,10 +66,11 @@ class Selling extends Component {
                     </View>
                 </Row> 
                 <Content style={{backgroundColor:'white'}}>     
-                {orderViews}               
+                    {orderViews}               
                 </Content>
                 <Row>
-                    <Button style={{alignSelf:'center'}} transparent small onPress={()=>this.addOrder()}>
+                    <Button style={{alignSelf:'center'}} transparent small onPress={()=>this.addOrder()} 
+                            disabled={wait}>
                         <Icon name="send" style={{fontSize:24,color:colors.accent}}/>
                     </Button>
                     <View style={{flex:1}}>
@@ -90,29 +82,25 @@ class Selling extends Component {
                             onChange={({nativeEvent})=>this.setCode(nativeEvent.text)}/>
                     </View>                    
                 </Row>
-                <Button block style={{backgroundColor:colors.accent}} onPress={()=>{
-                    this.submitFactorCode()
-                    this.setCode('');
-                }}>
+                <SimpleLoad wait={wait}>
+                    <Button block style={{backgroundColor:colors.accent}} onPress={()=>{
+                        this.submitFactorCode()
+                        this.setCode('');
+                    }}>
                     <Text big> ثبت نهایی! </Text>
-                </Button>             
+                    </Button>             
+                </SimpleLoad>
             </Container>
         );
     }
 }
 
 const mapStateToProps =(state)=>({
+    wait:state.waitForResponse,
+    message:state.message.selling,
     error:state.error.selling,
     orderFactor: state.newOrderFactor,
-    orders:state.newOrders.map(order=>{
-        const result = state.products.find((product => product.code == order.productCode)); 
-        const cat = state.categories.find(category=>category.id == result.categoryId);      
-        const subCat = state.subCategories.find(subCategory=>subCategory.id == result.subCategoryId);
-        return Object.assign({},result,{
-            category:cat.name,
-            subCategory:subCat.name,
-            count:order.count});
-    })
+    orders:state.newOrders
 })
 const mapDispatchToProps = (dispatch)=>({
     cleanOrderFactor:()=>{

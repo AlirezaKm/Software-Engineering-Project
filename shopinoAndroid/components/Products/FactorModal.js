@@ -30,12 +30,8 @@ class FactorModal extends Component{
             });
             if(action !== DatePickerAndroid.dismissedAction){
                 this.setState({
-                    date:{
-                        year:year,
-                        month:month,
-                        day:day
-                    }
-                })
+                    date:year+'-'+month+'-'+day                    
+                });
                 this.changeFactorInfo('date',this.state.date);
             }
         }
@@ -47,7 +43,7 @@ class FactorModal extends Component{
         const {wait,visible,setVisible,error,createFactor,message,clean} = this.props;
         const {date} = this.state;
         const onFade = ()=>clean();
-        if(this.timer == null && message){
+        if(message){
             this.timer = setTimeout(()=>{
                 setVisible(false);
                 onFade();
@@ -75,7 +71,7 @@ class FactorModal extends Component{
                         error={error.date?error.date:null}
                     >
                         <Button transparent onPress={()=>this.showDatePicker()}>
-                            <Text> {date?date.year+':'+date.month+':'+date.day:'انتخاب کنید'} </Text>
+                            <Text> {date?date:'انتخاب کنید'} </Text>
                         </Button>
                     </Field>
                     <SimpleLoad wait={wait}>
@@ -94,7 +90,7 @@ class FactorModal extends Component{
 const mapStateToProps =(state,ownProps)=>({
     wait:state.waitForResponse,
     error:state.error,
-    message:state.message.factor,
+    message:state.message.factors,
     newFactor:state.newFactor
 });
 const mapDispatchToProps = (dispatch,ownProps)=>({

@@ -1,21 +1,21 @@
 import C from './constants'
-import {createError} from './index'
+import {createError,cleanError} from './index'
+import {get,post} from '../api'
+import {sendMessage} from './helper'
+import urls from '../api/tables'
 
 export const addOrderFactor = (status)=>(dispatch,getState)=>{
     const newOrderFactor = getState().newOrderFactor;
-    if(newOrderFactor.count > 0 && newOrderFactor.sum > 0){
-        dispatch({
-            type:C.ADD_ORDER_FACTOR,
-            payload:{
-                ...newOrderFactor,
-                status:status
-            }
-        });
-        dispatch({
-            type:C.ADD_ORDERS,
-            payload:getState().newOrders
-        });
-        dispatch(cleanNewOrderFactor());
+    if(newOrderFactor.count > 0 && newOrderFactor.sum > 0){     
+        const parameters = {
+            ...newOrderFactor,
+            status:status,
+            orders:JSON.stringify(getState().newOrders)
+        }
+        post(urls.orderFactors,parameters,dispatch,(err,data)=>{
+            dispatch(cleanNewOrderFactor());
+            sendMessage('selling','سفارش ثبت شد',dispatch);
+        })                   
     }
     else{
         dispatch(createError('selling','هنوز سفارشی ثبت نشده است'));
@@ -28,19 +28,8 @@ const editNewOrderFactor = (info)=>({
 });
 
 export const cleanNewOrderFactor = ()=>(dispatch,getState)=>{
-    let maxCode=1;
-    const orderFactors = getState().orderFactors;
-    if(orderFactors.length>0){
-        orderFactors.forEach((item)=>{
-            if(item.code>maxCode)
-                maxCode=item.code;
-        });
-    }
     dispatch({
         type:C.CLEAR_NEW_ORDER_FACTOR,
-        payload:{
-            code:maxCode+1
-        }
     });
     dispatch({
         type:C.CLEAR_NEW_ORDERS
@@ -48,23 +37,32 @@ export const cleanNewOrderFactor = ()=>(dispatch,getState)=>{
 };
 
 export const addNewOrder = (productCode)=>(dispatch,getState)=>{
-    const orderFactorCode = getState().newOrderFactor.code;
-    const toBeAdded = getState().products.find(product=>product.code == productCode);
-    if(toBeAdded){
+    dispatch(cleanError('selling'));
+    const add = (data)=>{
         dispatch(editNewOrderFactor({
-            sum:toBeAdded.buyPrice,
+            sum:data.sellPrice,
             count:1
         }));
         dispatch({
             type:C.ADD_NEW_ORDER,
-            payload:{
-                productCode:productCode,
-                orderFactorCode:orderFactorCode
-            }
+            payload:data
         });
     }
+    const exist = getState().newOrders.find(order=>order.code == productCode);
+    if(exist){
+        console.log('exist:',exist);
+        add(exist);
+    }
     else{
-        dispatch(createError('selling','کد محصول درست وارد نشده است'));
+        get(urls.products,dispatch,(error,data)=>{
+            if(error){
+                dispatch(createError('selling','کد محصول درست وارد نشده است'));
+                return console.log('addNewOrder:error',error);
+            }        
+            data ['count'] = null;
+            add(data);
+            setTimeout(()=>console.log('newOrders:',getState().newOrders),500);
+        },"/"+productCode);
     }
 };
 

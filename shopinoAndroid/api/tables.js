@@ -2,8 +2,11 @@ export default  tables = {
     users:'users',
     factors:'factors',
     categories:'categories',
-    subcategories:'subCategories',
+    subcategories:'subcategories',
     properties:'properties',
     products:'products',
-    postproducts:'postproducts'
+    postproducts:'postproducts',
+    orderFactors:'orderfactors',
+    orders:'orders',
+    expenses:'expenses'
 }

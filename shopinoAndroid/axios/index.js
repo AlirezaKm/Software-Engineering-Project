@@ -5,7 +5,7 @@ const a1='Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZmN2M4Y2RiZDc3ZDc
 const a2= 'vmSN251Wre6kXf-leU5wWLh1Ar8fFoAeXw-lttPxGxYHDi2MCT3axqPc7_N4St4dgpuFSWJ_EThupe506S4_WxC283-JN3DWHnzy5gyGo2Hm-EjR2YWoEBTUvsM';
 
 const config ={
-    baseURL: 'http://10.0.3.2:3000/',
+    baseURL: 'http://shop.com/api',
     /*headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Authorization': a1+a2
