@@ -18,13 +18,13 @@ class FactorDetail extends Component{
         const {wait,error,products} = this.props;
 
         productViews = products.map(
-            ({code,name,sellPrice,count,category,subCategory})=>
+            ({code,name,sellPrice,count,category,subcategory})=>
             <CardRow
                 key={code}
                 title={name}
                 icon="pricetag" 
                 ItemOne={category.name}
-                ItemTwo={subCategory.name}
+                ItemTwo={subcategory.name}
                 badgeTop={sellPrice + 'تومان'} 
                 badgeBottom={count + 'عدد'}
             />)

@@ -64,7 +64,7 @@ class ProductCreate extends Component{
 }
 
 const mapStateToProps = (state,ownProps)=>({
-    wait:state.waitForResponse,
+    wait:state.waitForResponse,    
     error:state.error.products,
     message:state.message.products
 })

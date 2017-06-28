@@ -1,5 +1,5 @@
 import C from './constants'
-import {get,post} from '../api'
+import {get,post,put,del} from '../api'
 import urls from '../api/tables'
 import {sendMessage} from './helper'
 /*const navigateAction = NavigationActions.navigate({
@@ -354,7 +354,7 @@ export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
             console.log('add new Product property for selected product');
             dispatch(addNewProductProperty({
                 product:productCode,
-                property:item.propertyId,
+                property:item.property,
                 value:item.value
             }));      
         }
@@ -366,15 +366,17 @@ export const loadProducts = (page,factorId)=>(dispatch)=>{
 export const addProduct = () =>(dispatch,getState) =>{
     let newProduct = getState().newProduct;
     if(checkProductInfo(newProduct,dispatch,true)){
+        newProduct = {
+            ...newProduct,
+            productProperties:JSON.stringify(getState().newProductProperty)
+        }
         if(newProduct.code){//edit 
+            put(urls.products,newProduct.code,newProduct,dispatch,()=>{
+                dispatch(loadProducts());
+                sendMessage('products','محصول ویرایش شد',dispatch);
+            })
         }
         else{//add New
-            newProduct = {
-                ...newProduct,
-                productProperties:JSON.stringify(getState().newProductProperty)
-            }
-            console.log('newProduct:',newProduct);
-            console.log('addProduct:post:parameters:',newProduct);
             post(urls.products,newProduct,dispatch,(err,data)=>{
                 dispatch(loadProducts());
                 sendMessage('products','محصول ایجاد شد',dispatch);
@@ -383,13 +385,14 @@ export const addProduct = () =>(dispatch,getState) =>{
     }
 };
 
-export const deleteProduct = (productCode)=>({
-    type:C.REMOVE_PRODUCT,
-    payload:productCode
-});
+export const deleteProduct = (productCode)=>(dispatch)=>{
+    del(urls.products,productCode,dispatch,(err,data)=>{
+        dispatch(loadProducts());
+        sendMessage('products','محصول حذف شد',dispatch);
+    })
+};
 
 export const cleanNewProduct = ()=>(dispatch,getState)=>{
-    console.log('cleanNewProducr:start: newProduct: ',getState().newProduct);
     dispatch({
         type:C.CLEAN_NEW_PRODUCT,
         payload:{}
@@ -409,8 +412,6 @@ export const cleanNewProduct = ()=>(dispatch,getState)=>{
     dispatch({
         type:C.CLEAN_NEW_PRODUCT_PROPERTY
     });
-
-    setTimeout(()=>console.log('cleanNewProducr:end: newProduct: ',getState().newProduct),3000);
 }
 
 export const changeNewProduct = (productInfo) => (dispatch,getState)=>{

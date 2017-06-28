@@ -12,16 +12,15 @@ class Factors extends Component {
     render(){
         const {wait,error,title,factors,navigate,changeFactor} = this.props;
         const factorViews = factors.map(({id,seller,date,count,sum})=>{
-            const {day,month,year} = date;
             return (
                 <CardRow
                     key={id}
                     title={id+"#"}
                     icon="pricetag" 
-                    ItemOne={seller}
+                    ItemOne={seller.name}
                     ItemTwo={count + 'عدد'}
                     badgeTop={sum + 'تومان'} 
-                    badgeBottom={year+'/'+month+'/'+day}
+                    badgeBottom={date}
                     onPress={()=>{
                         changeFactor(id);
                         navigate('FactorDetail',{factorId:id});

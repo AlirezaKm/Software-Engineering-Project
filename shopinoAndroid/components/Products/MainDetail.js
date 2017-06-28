@@ -40,7 +40,7 @@ class MainDetail extends Component{
         if(edit.code){
             this.onFactorChanged(edit.factor.id);
             this.onCategoryChanged(edit.category.id);
-            this.onSubCategoryChanged(edit.subCategory.id);
+            this.onSubCategoryChanged(edit.subcategory.id);
         }
     }
     setModalVisible(modal,visible){

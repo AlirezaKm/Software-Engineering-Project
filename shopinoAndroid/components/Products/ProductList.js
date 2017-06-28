@@ -36,10 +36,9 @@ class ProductList extends React.Component{
         })
     }
     render(){
-        const {wait,error,products,changeProduct,removeProduct} = this.props;
+        const {wait,message,error,products,changeProduct,removeProduct} = this.props;
         const {navigate} = this.props.navigation;
         const {modalVisible,searchVisible} = this.state;
-        console.log('ProductList:render:',products);
         const productList = products.map((product)=>(            
             <CardRow
                 onLongPress={()=>this.setModalVisble(true,product.code)} 
@@ -56,6 +55,8 @@ class ProductList extends React.Component{
         ));
         return(
             <Container style={{backgroundColor:'white'}}>
+                {message&&<Text success background> {message} </Text>}
+                {error&& <Text error>{error}</Text>}
                 <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>
                     {productList}
                 </Load>
@@ -136,6 +137,7 @@ class ProductList extends React.Component{
 
 const mapStateToProps = (state, ownProps) =>({
     wait:state.waitForResponse,
+    message:state.message.products,
     error:state.error.products,
     products:state.products
 })

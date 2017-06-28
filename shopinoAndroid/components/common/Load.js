@@ -5,8 +5,8 @@ import {colors} from '../styles'
 
 const Load=({wait,children,message,error,onError})=>(
     <Content>
-        <Text center>{message?message:""}</Text>
-        <Text error center>{error?error:""}</Text>
+        {message&&<Text center>{message}</Text>}
+        {error&&<Text error center>{error}</Text>}
         {error&&
             <Button transparent style={{alignSelf:'center'}} onPress={onError}>
                 <Text style={{color:colors.primary}}>سعی مجدد</Text>
