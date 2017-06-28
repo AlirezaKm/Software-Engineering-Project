@@ -44,7 +44,8 @@ class Factors extends Model
 
     public $fillable = [
         'seller',
-        'sum'
+        'sum',
+        'date'
     ];
 
     /**
@@ -55,7 +56,8 @@ class Factors extends Model
     protected $casts = [
         'id' => 'integer',
         'seller' => 'integer',
-        'sum' => 'float'
+        'sum' => 'float',
+        'date' => 'string'
     ];
 
     /**
@@ -72,7 +74,7 @@ class Factors extends Model
      **/
     public function seller()
     {
-        return $this->belongsTo(\App\Models\Sellers::class);
+        return $this->belongsTo(\App\Models\Sellers::class,'seller');
     }
 
     /**

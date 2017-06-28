@@ -71,7 +71,7 @@ class Property extends Model
      **/
     public function subCategory()
     {
-        return $this->belongsTo(\App\Models\SubCategory::class);
+        return $this->belongsTo(\App\Models\SubCategory::class,'subcategory');
     }
 
     /**

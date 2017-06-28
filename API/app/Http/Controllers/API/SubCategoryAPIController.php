@@ -63,8 +63,12 @@ class SubCategoryAPIController extends AppBaseController
     {
         $this->subCategoryRepository->pushCriteria(new RequestCriteria($request));
         $this->subCategoryRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $subCategories = $this->subCategoryRepository->all();
-
+        $subCategories = SubCategory::with('category');
+        if($request->has('category')){
+            $category = $request->input('category');
+            $subCategories = $subCategories->where('category',$category);
+        }
+        $subCategories = $subCategories->get();
         return $this->sendResponse($subCategories->toArray(), 'Sub Categories retrieved successfully');
     }
 

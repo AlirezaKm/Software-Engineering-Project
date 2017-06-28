@@ -80,6 +80,6 @@ class OrderFactor extends Model
      **/
     public function orderStatus()
     {
-        return $this->belongsTo(\App\Models\OrderStatus::class);
+        return $this->belongsTo(\App\Models\OrderStatus::class,'status');
     }
 }

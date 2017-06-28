@@ -24,6 +24,7 @@ class FactorsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('seller');
             $table->double('sum')->default(0);
+            $table->date('date')->nullable();
             $table->timestamps();
             $table->softDeletes();
             # Foreign Keys

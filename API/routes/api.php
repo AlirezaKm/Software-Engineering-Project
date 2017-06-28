@@ -17,6 +17,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+# Authentication
+Route::post('login','AuthController@login');
+
+# This Function Available From In Site (Just Loggedin User), This Mean Just Admin Can Registered a user (Admin , Stockman , Accountant , Seller)
+Route::post('register','AuthController@register');
+
+
 
 Route::resource('user_types', 'API\UserTypeAPIController');
 
@@ -26,7 +33,7 @@ Route::resource('products', 'API\ProductAPIController');
 
 Route::resource('categories', 'API\CategoryAPIController');
 
-Route::resource('sub_categories', 'API\SubCategoryAPIController');
+Route::resource('subcategories', 'API\SubCategoryAPIController');
 
 Route::resource('properties', 'API\PropertyAPIController');
 

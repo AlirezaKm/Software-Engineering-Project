@@ -62,6 +62,7 @@ class Product extends Model
 {
     use SoftDeletes;
 
+    protected $primaryKey = "code";
     public $table = 'Product';
     
     const CREATED_AT = 'created_at';
@@ -69,7 +70,6 @@ class Product extends Model
 
 
     protected $dates = ['deleted_at'];
-
 
     public $fillable = [
         'factor',
@@ -111,7 +111,7 @@ class Product extends Model
      **/
     public function category()
     {
-        return $this->belongsTo(\App\Models\Category::class);
+        return $this->belongsTo(\App\Models\Category::class,'category');
     }
 
     /**
@@ -119,7 +119,7 @@ class Product extends Model
      **/
     public function factor()
     {
-        return $this->belongsTo(\App\Models\Factors::class);
+        return $this->belongsTo(\App\Models\Factors::class,'factor');
     }
 
     /**
@@ -127,7 +127,7 @@ class Product extends Model
      **/
     public function subCategory()
     {
-        return $this->belongsTo(\App\Models\SubCategory::class);
+        return $this->belongsTo(\App\Models\SubCategory::class,'subcategory');
     }
 
     /**

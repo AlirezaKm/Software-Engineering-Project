@@ -44,7 +44,8 @@ class ProductProperty extends Model
 
     public $fillable = [
         'product',
-        'property'
+        'property',
+        'value'
     ];
 
     /**
@@ -55,7 +56,8 @@ class ProductProperty extends Model
     protected $casts = [
         'id' => 'integer',
         'product' => 'integer',
-        'property' => 'integer'
+        'property' => 'integer',
+        'value' => 'string'
     ];
 
     /**

@@ -78,9 +78,9 @@ class Order extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      **/
-    public function factor()
+    public function OrderFactor()
     {
-        return $this->belongsTo(\App\Models\Factors::class);
+        return $this->belongsTo(\App\Models\OrderFactor::class,'orderFactor');
     }
 
     /**
@@ -88,6 +88,6 @@ class Order extends Model
      **/
     public function product()
     {
-        return $this->belongsTo(\App\Models\Product::class);
+        return $this->belongsTo(\App\Models\Product::class,'product');
     }
 }

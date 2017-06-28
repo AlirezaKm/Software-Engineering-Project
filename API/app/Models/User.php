@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * @SWG\Definition(
- *      definition="User",
+ *      definition="Users",
  *      required={""},
  *      @SWG\Property(
  *          property="id",
@@ -48,12 +50,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *      )
  * )
  */
-class User extends Model
+class User extends Authenticatable
 {
-    use SoftDeletes;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     public $table = 'users';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -92,7 +94,7 @@ class User extends Model
      * @var array
      */
     public static $rules = [
-        
+
     ];
 
     /**

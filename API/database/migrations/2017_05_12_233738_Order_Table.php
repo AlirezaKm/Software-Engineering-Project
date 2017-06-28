@@ -22,7 +22,7 @@ class OrderTable extends Migration
             $table->softDeletes();
             # Foreign Keys
             $table->foreign('product')->references('code')->on('Product');
-            $table->foreign('orderFactor')->references('id')->on('Factors');
+            $table->foreign('orderFactor')->references('id')->on('OrderFactors');
         });
     }
 

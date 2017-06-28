@@ -63,8 +63,12 @@ class PropertyAPIController extends AppBaseController
     {
         $this->propertyRepository->pushCriteria(new RequestCriteria($request));
         $this->propertyRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $properties = $this->propertyRepository->all();
-
+        $properties = Property::with('subcategory');
+        if($request->has('subCategory') && is_numeric($request->input('subCategory'))){
+            $subCategory = $request->input('subCategory') > 0 ? $request->input('subCategory') : 0;
+            $properties = $properties->where('subCategory',$subCategory);
+        }
+        $properties = $properties->get();
         return $this->sendResponse($properties->toArray(), 'Properties retrieved successfully');
     }
 

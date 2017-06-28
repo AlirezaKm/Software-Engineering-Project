@@ -63,8 +63,8 @@ class OrderAPIController extends AppBaseController
     {
         $this->orderRepository->pushCriteria(new RequestCriteria($request));
         $this->orderRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $orders = $this->orderRepository->all();
-
+        // Just For Test Here inO gOzashtam namOsan :|
+        $orders = Order::with('orderFactor','product')->get();
         return $this->sendResponse($orders->toArray(), 'Orders retrieved successfully');
     }
 

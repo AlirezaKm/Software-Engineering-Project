@@ -63,8 +63,38 @@ class ProductAPIController extends AppBaseController
     {
         $this->productRepository->pushCriteria(new RequestCriteria($request));
         $this->productRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $products = $this->productRepository->all();
+        $products = Product::with('category','subcategory','factor');
+        $SizeOfPage = 10;
+        if($request->has('orderFactor')){
 
+        }else {
+            // Not Trust Here , Security RIDE namOsan !
+            if($request->has('limit') && is_numeric($request->input('limit'))){
+                $limit = $request->input('limit');
+                $products = $products->limit($limit);
+            }else{
+                $products = $products->limit($SizeOfPage);
+            }
+            if($request->has('page') && is_numeric($request->input('page'))){
+                $page = $request->input('page') > 1 ? $request->input('page') : 1;
+                $products = $products->offset(($page - 1)*$SizeOfPage+1);
+            }else{
+                $products = $products->offset(0);
+            }
+            if($request->has('category') && is_numeric($request->input('category'))){
+                $category = $request->input('category') > 0 ? $request->input('category') : 0;
+                $products = $products->where('category',$category);
+            }
+            if($request->has('subCategory') && is_numeric($request->input('subCategory'))){
+                $subcategory = $request->input('subCategory') > 0 ? $request->input('subCategory') : 0;
+                $products = $products->where('subcategory',$subcategory);
+            }
+            if($request->has('name')){
+                $name = $request->input('name');
+                $products = $products->where('name',$name);
+            }
+        }
+        $products = $products->get();
         return $this->sendResponse($products->toArray(), 'Products retrieved successfully');
     }
 

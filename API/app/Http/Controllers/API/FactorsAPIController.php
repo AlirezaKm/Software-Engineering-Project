@@ -61,10 +61,22 @@ class FactorsAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
+
         $this->factorsRepository->pushCriteria(new RequestCriteria($request));
         $this->factorsRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $factors = $this->factorsRepository->all();
+        $SizeOfPage = 5;
+        $factors = Factors::with('seller');
 
+        if($request->has('page') && is_numeric($request->input('page'))){
+            $page = $request->input('page') > 1 ? $request->input('page') : 1;
+            // Check inja ro , perhaps offset bayad bashe ($page+$SizeOfPage + 1)
+            $factors = $factors->limit($SizeOfPage)->offset(($page - 1)*$SizeOfPage);
+        }else{
+            $factors = $factors->orderBy('id','desc')->take($SizeOfPage);
+
+        }
+
+        $factors = $factors->get();
         return $this->sendResponse($factors->toArray(), 'Factors retrieved successfully');
     }
 
