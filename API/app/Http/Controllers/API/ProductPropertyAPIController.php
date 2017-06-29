@@ -63,8 +63,12 @@ class ProductPropertyAPIController extends AppBaseController
     {
         $this->productPropertyRepository->pushCriteria(new RequestCriteria($request));
         $this->productPropertyRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $productProperties = $this->productPropertyRepository->all();
-
+        if($request->has('product') && is_numeric($request->input('product'))){
+            $product = $request->input('product');
+            $productProperties = ProductProperty::where('product',$product)->get();
+        }else{
+            $productProperties = ProductProperty::all();
+        }
         return $this->sendResponse($productProperties->toArray(), 'Product Properties retrieved successfully');
     }
 

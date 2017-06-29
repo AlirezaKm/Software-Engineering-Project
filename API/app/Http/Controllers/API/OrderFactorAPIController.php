@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateOrderFactorAPIRequest;
 use App\Models\OrderFactor;
 use App\Repositories\OrderFactorRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -63,8 +64,12 @@ class OrderFactorAPIController extends AppBaseController
     {
         $this->orderFactorRepository->pushCriteria(new RequestCriteria($request));
         $this->orderFactorRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $orderFactors = $this->orderFactorRepository->all();
-
+        $orderFactors = DB::table('Order')
+            ->join('Product','Order.product','=','Product.code')
+            ->join('OrderFactor','Order.orderFactor','=','OrderFactor.id')
+            ->select(DB::raw('OrderFactor.* ,SUM(Order.count) AS \'count\' , SUM(Product.sellPrice) AS \'sum\''))
+            ->groupBy('OrderFactor.id')
+            ->get();
         return $this->sendResponse($orderFactors->toArray(), 'Order Factors retrieved successfully');
     }
 

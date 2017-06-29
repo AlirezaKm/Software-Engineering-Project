@@ -144,19 +144,25 @@ class ProductAPIController extends AppBaseController
      */
     public function store(CreateProductAPIRequest $request)
     {
-        $productInfo = $request->except('productPropertise');
+        //return  $request->all();
+        $productInfo = $request->except('productProperties');
         $product = $this->productRepository->create($productInfo);
-        if($productInfo === null){
-            return $this->sendError('Product Not Craeted!');
+        if(empty($product)){
+            return $this->sendError('Product Not Created!');
         }
-        if($request->has('productPropertise')){
-            $productProperties = $request->only('productPropertise');
-            $pp = $productProperties['productPropertise'];
+        if($request->has('productProperties')){
+            $productProperties = $request->only('productProperties');
+            if(is_string($productProperties['productProperties'])){
+                $pp = json_decode($productProperties['productProperties'],true);
+            }else{
+                $pp = $productProperties['productProperties'];
+            }
             if($pp !== null){
                 for ($i = 0 ; $i < count($pp) ; $i++){
                     $pp[$i] += array('product' => $product->code);
                 }
             }
+            //return $pp;
             // Here insert ProductProperty
             DB::table('ProductProperty')->insert($pp);
         }
@@ -261,18 +267,34 @@ class ProductAPIController extends AppBaseController
      */
     public function update($id, UpdateProductAPIRequest $request)
     {
-        $input = $request->all();
-
-        /** @var Product $product */
         $product = $this->productRepository->findWithoutFail($id);
-
-        if (empty($product)) {
-            return $this->sendError('Product not found');
+        if(empty($product)){
+            return $this->sendError('Product Not Found!');
         }
 
-        $product = $this->productRepository->update($input, $id);
+        $productInfo = $request->except('productProperties');
+        $product = $this->productRepository->update($productInfo, $id);
 
-        return $this->sendResponse($product->toArray(), 'Product updated successfully');
+        // Here is kOs kharingO namOsan !
+        if($request->has('productProperties')){
+            $productProperties = $request->only('productProperties');
+            if(is_string($productProperties['productProperties'])){
+                $pp = json_decode($productProperties['productProperties'],true);
+            }else{
+                $pp = $productProperties['productProperties'];
+            }
+            # Delete All ROWs and re Define them!
+            ProductProperty::where('product',$id)->delete();
+            if($pp !== null){
+                for ($i = 0 ; $i < count($pp) ; $i++){
+                    $pp[$i] += array('product' => $product->code);
+                    unset($pp[$i]['id']);
+                }
+            }
+            DB::table('ProductProperty')->insert($pp);
+        }
+        /** @var Product $product */
+        return $this->sendResponse($request->all(), 'Product updated successfully');
     }
 
     /**

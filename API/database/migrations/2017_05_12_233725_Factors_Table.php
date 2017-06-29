@@ -23,7 +23,6 @@ class FactorsTable extends Migration
         Schema::create('Factors', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('seller');
-            $table->double('sum')->default(0);
             $table->date('date')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -5,8 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateFactorsAPIRequest;
 use App\Http\Requests\API\UpdateFactorsAPIRequest;
 use App\Models\Factors;
+use App\Models\Product;
+use App\Models\ProductProperty;
 use App\Repositories\FactorsRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -71,12 +74,17 @@ class FactorsAPIController extends AppBaseController
             $page = $request->input('page') > 1 ? $request->input('page') : 1;
             // Check inja ro , perhaps offset bayad bashe ($page+$SizeOfPage + 1)
             $factors = $factors->limit($SizeOfPage)->offset(($page - 1)*$SizeOfPage);
+        }else if($request->has('sum')){
+            # Define Here For Just Show Factors Summation and Counter
+            $factors = DB::table('Factors')
+                ->join('Product','Factors.id','=','Product.factor')
+                ->select(DB::raw('SUM(Product.sellPrice) AS sum,COUNT(*) AS count,Factors.*'))
+                ->groupBy('Factors.id');
         }else{
             $factors = $factors->orderBy('id','desc')->take($SizeOfPage);
-
         }
-
         $factors = $factors->get();
+        // Show Factors With
         return $this->sendResponse($factors->toArray(), 'Factors retrieved successfully');
     }
 
@@ -173,8 +181,8 @@ class FactorsAPIController extends AppBaseController
         if (empty($factors)) {
             return $this->sendError('Factors not found');
         }
-
-        return $this->sendResponse($factors->toArray(), 'Factors retrieved successfully');
+        $factors = $factors->toArray() + array('sum' => (double)Product::where('factor',$id)->sum('sellPrice') , 'count' =>count(Product::where('factor',$id)->get()));
+        return $this->sendResponse($factors, 'Factors retrieved successfully');
     }
 
     /**

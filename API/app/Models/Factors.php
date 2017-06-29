@@ -44,7 +44,6 @@ class Factors extends Model
 
     public $fillable = [
         'seller',
-        'sum',
         'date'
     ];
 
@@ -56,7 +55,6 @@ class Factors extends Model
     protected $casts = [
         'id' => 'integer',
         'seller' => 'integer',
-        'sum' => 'float',
         'date' => 'string'
     ];
 

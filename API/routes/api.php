@@ -37,7 +37,7 @@ Route::resource('subcategories', 'API\SubCategoryAPIController');
 
 Route::resource('properties', 'API\PropertyAPIController');
 
-Route::resource('product_properties', 'API\ProductPropertyAPIController');
+Route::resource('productproperties', 'API\ProductPropertyAPIController');
 
 Route::resource('expenses', 'API\ExpenseAPIController');
 
@@ -49,4 +49,4 @@ Route::resource('order_statuses', 'API\OrderStatusAPIController');
 
 Route::resource('sellers', 'API\SellersAPIController');
 
-Route::resource('order_factors', 'API\OrderFactorAPIController');
+Route::resource('orderfactors', 'API\OrderFactorAPIController');
