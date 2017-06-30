@@ -362,7 +362,6 @@ export const selectedProduct = (state = 0, action)=>{
 
 export const selectedOrderFactor = (state=0,action)=>{
     if(action.type === C.CHANGE_SELECTED_ORDER_FACTOR){
-        console.log('reducer:selectedOrderFactor:',action.payload);
         return action.payload;
     }
     else{
@@ -480,6 +479,8 @@ export const newProductProperty = (state=[],action)=>{
             
         case C.CLEAN_NEW_PRODUCT_PROPERTY:
             return [];
+        case C.LOAD_PRODUCTPROPERTIES:
+            return action.payload;
         default:
             return state;
     }

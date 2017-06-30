@@ -137,7 +137,7 @@ const checkFactorInfo = (info,dispatch,final = false)=>{
     }
     
     if(date){
-        if(seller.replace(" ","").length == 0){
+        if(date.replace(" ","").length == 0){
             success = false;
             dispatch(createError('date','تاریخ انتخاب نشده است'));    
         }
@@ -340,29 +340,31 @@ export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
         type:C.CHANGE_SELECTED_PRODUCT,
         payload:productCode
     });
-    const info ={
-        code:productCode,
-        ...getState().products.find((item)=> item.code === productCode)
-    }
-    console.log('newProduct Info',info);
+    get(urls.productProperties,dispatch,null,"?product="+productCode);
+
+    let product = getState().products.find((item)=> item.code === productCode);
+    
     dispatch({
         type:C.CHANGE_NEW_PRODUCT,
-        payload:info
-    });
-    getState().productProperty.forEach(item=>{
-        if(item.productCode == productCode){
-            console.log('add new Product property for selected product');
-            dispatch(addNewProductProperty({
-                product:productCode,
-                property:item.property,
-                value:item.value
-            }));      
-        }
+        payload:product
     });
 };
-export const loadProducts = (page,factorId)=>(dispatch)=>{
-    get(urls.products,dispatch,null,factorId?"?factor="+factorId:'');
+
+export const loadProducts = (page,factorId)=>(dispatch,getState)=>{
+    const searchInfo =getState().search;
+    let params='';
+    if(factorId || searchInfo.name){
+        params+='?';
+        params+=factorId?'factor='+factorId:'';
+        if(params.length!=1){
+            params+='&';
+        }
+        params+=searchInfo.name?'name='+searchInfo.name:'';
+    }
+    console.log('loadProducts:params: ',params);
+    get(urls.products,dispatch,null,params);
 }
+
 export const addProduct = () =>(dispatch,getState) =>{
     let newProduct = getState().newProduct;
     if(checkProductInfo(newProduct,dispatch,true)){
@@ -378,6 +380,7 @@ export const addProduct = () =>(dispatch,getState) =>{
         }
         else{//add New
             post(urls.products,newProduct,dispatch,(err,data)=>{
+                console.log('post:data:',data);
                 dispatch(loadProducts());
                 sendMessage('products','محصول ایجاد شد',dispatch);
             });

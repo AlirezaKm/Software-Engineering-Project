@@ -42,7 +42,11 @@ export const post = (table,parameters,dispatch,mycallback=null)=>{
     dispatch(cleanError(table));
     sendRequest(dispatch);
     console.log('sendRequest:post',parameters);
-    setTimeout(()=>axios.post(table,parameters)
+    setTimeout(()=>axios.post(table,parameters,{
+        'headers':{                
+                'Content-Type':'application/json'                
+        }
+    })
         .then(response=>{
             console.log('Response Recieved:post:',response.data);
             if (/*response.status == 201*/response.data.success) {

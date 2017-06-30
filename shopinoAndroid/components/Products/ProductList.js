@@ -39,6 +39,7 @@ class ProductList extends React.Component{
         const {wait,message,error,products,changeProduct,removeProduct} = this.props;
         const {navigate} = this.props.navigation;
         const {modalVisible,searchVisible} = this.state;
+        console.log('product:count: ',products.length);
         const productList = products.map((product)=>(            
             <CardRow
                 onLongPress={()=>this.setModalVisble(true,product.code)} 
@@ -55,13 +56,13 @@ class ProductList extends React.Component{
         ));
         return(
             <Container style={{backgroundColor:'white'}}>
-                {message&&<Text success background> {message} </Text>}
-                {error&& <Text error>{error}</Text>}
                 <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>
+                    {message&&<Text success background> {message} </Text>}
                     {productList}
                 </Load>
 
-                <ActionSheet title="جستجو" visible={searchVisible} setVisible={(visible)=>this.setSearchVisible(visible)}>    
+                <ActionSheet title="جستجو" visible={searchVisible} 
+                    setVisible={(visible)=>this.setSearchVisible(visible)}>    
                 </ActionSheet>
             <Modal 
                 title="آیا از حذف محصول مطمئن هستید؟"
@@ -80,8 +81,6 @@ class ProductList extends React.Component{
                         </Button>
                     </View>      
             </Modal>
-                <Body>
-                </Body>
             <Footer style={{height:40,borderTopLeftRadius:16,borderTopRightRadius:16}}>
                 <FooterTab style={{backgroundColor:colors.accent,borderTopLeftRadius:16,borderTopRightRadius:16}}>
                     <Button transparent onPress={()=>this.setSearchVisible(true)}>

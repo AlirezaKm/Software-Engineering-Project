@@ -8,5 +8,6 @@ export default  tables = {
     postproducts:'postproducts',
     orderFactors:'orderfactors',
     orders:'orders',
-    expenses:'expenses'
+    expenses:'expenses',
+    productProperties:'productproperties'
 }

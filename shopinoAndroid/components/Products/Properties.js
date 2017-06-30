@@ -15,7 +15,6 @@ class Properties extends Component{
             loadingProperties,
             properties,error,changeProperty,createProperty,addProductProperty,edit,editCode} 
         = this.props;
-
         const propertyItems = properties.map((item,index)=>{
             const temp = edit.find(element=> element.property == item.id);
             console.log('temp:',temp);

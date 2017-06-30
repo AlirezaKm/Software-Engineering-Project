@@ -7,7 +7,8 @@ const a2= 'vmSN251Wre6kXf-leU5wWLh1Ar8fFoAeXw-lttPxGxYHDi2MCT3axqPc7_N4St4dgpuFS
 const config ={
     baseURL: 'http://shop.com/api',
     /*headers: {
-        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type':'application/json'   
+        /*'X-Requested-With': 'XMLHttpRequest',
         'Authorization': a1+a2
     },*/
     timeout: 2000,

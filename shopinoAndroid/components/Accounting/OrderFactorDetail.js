@@ -15,16 +15,17 @@ class OrderFactorDetail extends Component{
     }
     render(){
         const {wait,error,orders} = this.props;
+        console.log('orders:',orders);  
         ordersView = orders.map(
-            ({code,name,sellPrice,count,category,subCategory})=>
+            ({code,product})=>
             <CardRow
                 key={code}
-                title={name}
+                title={product.name}
                 icon="pricetag" 
-                ItemOne={category}
-                ItemTwo={subCategory}
-                badgeTop={sellPrice + ' تومان'} 
-                badgeBottom={count + ' عدد'}
+                ItemOne={product.category.name}
+                ItemTwo={product.subcategory.name}
+                badgeTop={product.sellPrice + ' تومان'} 
+                badgeBottom={product.count + ' عدد'}
             />)
         return(
             <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>
