@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateSellersAPIRequest;
 use App\Http\Requests\API\UpdateSellersAPIRequest;
+use App\Models\LOG;
 use App\Models\Sellers;
 use App\Repositories\SellersRepository;
 use Illuminate\Http\Request;
@@ -111,7 +112,7 @@ class SellersAPIController extends AppBaseController
         $input = $request->all();
 
         $sellers = $this->sellersRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فروشنده %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$sellers->name),$request);}
         return $this->sendResponse($sellers->toArray(), 'Sellers saved successfully');
     }
 
@@ -223,7 +224,7 @@ class SellersAPIController extends AppBaseController
         }
 
         $sellers = $this->sellersRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فروشنده %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$sellers->name),$request);}
         return $this->sendResponse($sellers->toArray(), 'Sellers updated successfully');
     }
 
@@ -265,17 +266,17 @@ class SellersAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         /** @var Sellers $sellers */
         $sellers = $this->sellersRepository->findWithoutFail($id);
-
+        $seller = $sellers;
         if (empty($sellers)) {
             return $this->sendError('Sellers not found');
         }
 
         $sellers->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فروشنده %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$seller->name),$request);}
         return $this->sendResponse($id, 'Sellers deleted successfully');
     }
 }

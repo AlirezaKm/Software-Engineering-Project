@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreatePropertyAPIRequest;
 use App\Http\Requests\API\UpdatePropertyAPIRequest;
+use App\Models\LOG;
 use App\Models\Property;
 use App\Repositories\PropertyRepository;
 use Illuminate\Http\Request;
@@ -115,7 +116,7 @@ class PropertyAPIController extends AppBaseController
         $input = $request->all();
 
         $properties = $this->propertyRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s ویژگی %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$properties->name),$request);}
         return $this->sendResponse($properties->toArray(), 'Property saved successfully');
     }
 
@@ -227,7 +228,7 @@ class PropertyAPIController extends AppBaseController
         }
 
         $property = $this->propertyRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s ویژگی %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$property->name),$request);}
         return $this->sendResponse($property->toArray(), 'Property updated successfully');
     }
 
@@ -269,17 +270,17 @@ class PropertyAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var Property $property */
         $property = $this->propertyRepository->findWithoutFail($id);
-
+        $prop = $property;
         if (empty($property)) {
             return $this->sendError('Property not found');
         }
 
         $property->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s ویژگی %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$prop->name),$request);}
         return $this->sendResponse($id, 'Property deleted successfully');
     }
 }

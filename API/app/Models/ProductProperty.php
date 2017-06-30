@@ -66,7 +66,9 @@ class ProductProperty extends Model
      * @var array
      */
     public static $rules = [
-        
+        'product' => 'required|numeric',
+        'property' => 'required|numeric',
+        'value' => 'required'
     ];
 
     /**

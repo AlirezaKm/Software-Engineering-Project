@@ -72,7 +72,9 @@ class OrderFactor extends Model
      * @var array
      */
     public static $rules = [
-        
+        'status' => 'required|numeric',
+        'count' => 'required|numeric',
+        'sum' => 'required|numeric'
     ];
 
     /**

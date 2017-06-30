@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateExpenseAPIRequest;
 use App\Http\Requests\API\UpdateExpenseAPIRequest;
 use App\Models\Expense;
+use App\Models\LOG;
 use App\Repositories\ExpenseRepository;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Controller\AppBaseController;
@@ -111,7 +112,7 @@ class ExpenseAPIController extends AppBaseController
         $input = $request->all();
 
         $expenses = $this->expenseRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s هزینه های %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$expenses->title),$request);}
         return $this->sendResponse($expenses->toArray(), 'Expense saved successfully');
     }
 
@@ -223,7 +224,7 @@ class ExpenseAPIController extends AppBaseController
         }
 
         $expense = $this->expenseRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s هزینه های %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$expense->title),$request);}
         return $this->sendResponse($expense->toArray(), 'Expense updated successfully');
     }
 
@@ -265,17 +266,17 @@ class ExpenseAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         /** @var Expense $expense */
         $expense = $this->expenseRepository->findWithoutFail($id);
-
+        $ex = $expense;
         if (empty($expense)) {
             return $this->sendError('Expense not found');
         }
 
         $expense->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s هزینه های %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$ex->title),$request);}
         return $this->sendResponse($id, 'Expense deleted successfully');
     }
 }

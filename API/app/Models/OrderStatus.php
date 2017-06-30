@@ -55,7 +55,7 @@ class OrderStatus extends Model
      * @var array
      */
     public static $rules = [
-        
+        'name' => 'required|alpha'
     ];
 
     /**

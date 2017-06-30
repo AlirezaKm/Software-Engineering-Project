@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateUserTypeAPIRequest;
 use App\Http\Requests\API\UpdateUserTypeAPIRequest;
+use App\Models\LOG;
 use App\Models\UserType;
 use App\Repositories\UserTypeRepository;
 use Illuminate\Http\Request;
@@ -111,7 +112,7 @@ class UserTypeAPIController extends AppBaseController
         $input = $request->all();
 
         $userTypes = $this->userTypeRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s نوع کاربری %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$userTypes->name),$request);}
         return $this->sendResponse($userTypes->toArray(), 'User Type saved successfully');
     }
 
@@ -223,7 +224,7 @@ class UserTypeAPIController extends AppBaseController
         }
 
         $userType = $this->userTypeRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s نوع کاربری %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$userType->name),$request);}
         return $this->sendResponse($userType->toArray(), 'UserType updated successfully');
     }
 
@@ -265,17 +266,17 @@ class UserTypeAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var UserType $userType */
         $userType = $this->userTypeRepository->findWithoutFail($id);
-
+        $ut = $userType;
         if (empty($userType)) {
             return $this->sendError('User Type not found');
         }
 
         $userType->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s نوع کاربری %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$ut->name),$request);}
         return $this->sendResponse($id, 'User Type deleted successfully');
     }
 }

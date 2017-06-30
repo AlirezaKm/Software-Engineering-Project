@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateOrderAPIRequest;
 use App\Http\Requests\API\UpdateOrderAPIRequest;
+use App\Models\LOG;
 use App\Models\Order;
 use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
@@ -67,7 +68,7 @@ class OrderAPIController extends AppBaseController
         $orders = Order::with('orderFactor','product');
         if($request->has('orderFactor') && is_numeric($request->input('orderFactor'))){
             $orderFactor = $request->input('orderFactor') > 0 ? $request->input('orderFactor') : 0;
-            $orders = $orders->where('orderFactor',$request->input('orderFactor'));
+            $orders = $orders->where('orderFactor',$orderFactor);
         }
         $orders = $orders->get();
         return $this->sendResponse($orders->toArray(), 'Orders retrieved successfully');
@@ -116,7 +117,7 @@ class OrderAPIController extends AppBaseController
         $input = $request->all();
 
         $orders = $this->orderRepository->create($input);
-
+        LOG::infoReq(sprintf("کاربر %s سفارش به شماره %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$orders->id),$request);
         return $this->sendResponse($orders->toArray(), 'Order saved successfully');
     }
 
@@ -228,7 +229,7 @@ class OrderAPIController extends AppBaseController
         }
 
         $order = $this->orderRepository->update($input, $id);
-
+        LOG::infoReq(sprintf("کاربر %s سفارش به شماره %s را به روزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$order->id),$request);
         return $this->sendResponse($order->toArray(), 'Order updated successfully');
     }
 
@@ -270,17 +271,17 @@ class OrderAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var Order $order */
         $order = $this->orderRepository->findWithoutFail($id);
-
+        $ord  = $order;
         if (empty($order)) {
             return $this->sendError('Order not found');
         }
 
         $order->delete();
-
+        LOG::infoReq(sprintf("کاربر %s سفارش به شماره %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$ord->id),$request);
         return $this->sendResponse($id, 'Order deleted successfully');
     }
 }

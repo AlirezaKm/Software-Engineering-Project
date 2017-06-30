@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProductAPIRequest;
 use App\Http\Requests\API\UpdateProductAPIRequest;
+use App\Models\LOG;
 use App\Models\Product;
 use App\Models\ProductProperty;
 use App\Repositories\ProductRepository;
@@ -66,13 +67,13 @@ class ProductAPIController extends AppBaseController
         $this->productRepository->pushCriteria(new RequestCriteria($request));
         $this->productRepository->pushCriteria(new LimitOffsetCriteria($request));
         $products = Product::with('category','subcategory','factor');
-        $SizeOfPage = 10;
+        $SizeOfPage = 12;
         if($request->has('orderFactor')){
 
         }else {
             // Not Trust Here , Security RIDE namOsan !
             if($request->has('limit') && is_numeric($request->input('limit'))){
-                $limit = $request->input('limit');
+                $limit = $request->input('limit') > 0 ? $request->input('limit') : 1;
                 $products = $products->limit($limit);
             }else{
                 $products = $products->limit($SizeOfPage);
@@ -100,7 +101,7 @@ class ProductAPIController extends AppBaseController
                 $products = $products->where('factor',$factor);
             }
         }
-        $products = $products->get();
+        $products = $products->orderBy('code','desc')->get();
         return $this->sendResponse($products->toArray(), 'Products retrieved successfully');
     }
 
@@ -165,6 +166,9 @@ class ProductAPIController extends AppBaseController
             //return $pp;
             // Here insert ProductProperty
             DB::table('ProductProperty')->insert($pp);
+        }
+        if(LOG::$log_is_on) {
+            LOG::infoReq(sprintf("کاربر %s محصول %s را ایجاد کرده است.", $request->user()->fname . " " . $request->user()->lname, $product->name), $request);
         }
         return $this->sendResponse($request->all(), 'Product saved successfully');
     }
@@ -293,6 +297,9 @@ class ProductAPIController extends AppBaseController
             }
             DB::table('ProductProperty')->insert($pp);
         }
+        if(LOG::$log_is_on) {
+            //LOG::infoReq(sprintf("کاربر %s محصول %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$product->name),$request);
+        }
         /** @var Product $product */
         return $this->sendResponse($request->all(), 'Product updated successfully');
     }
@@ -335,17 +342,16 @@ class ProductAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var Product $product */
         $product = $this->productRepository->findWithoutFail($id);
-
+        $pro = $product;
         if (empty($product)) {
             return $this->sendError('Product not found');
         }
-
         $product->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s محصول %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$pro->name),$request);}
         return $this->sendResponse($id, 'Product deleted successfully');
     }
 }

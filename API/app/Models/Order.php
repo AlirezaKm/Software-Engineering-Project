@@ -72,7 +72,9 @@ class Order extends Model
      * @var array
      */
     public static $rules = [
-        
+        'product' => 'required|numeric',
+        'count' => 'required|numeric',
+        'orderFactor' => 'required|numeric'
     ];
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProductPropertyAPIRequest;
 use App\Http\Requests\API\UpdateProductPropertyAPIRequest;
+use App\Models\LOG;
 use App\Models\ProductProperty;
 use App\Repositories\ProductPropertyRepository;
 use Illuminate\Http\Request;
@@ -115,7 +116,7 @@ class ProductPropertyAPIController extends AppBaseController
         $input = $request->all();
 
         $productProperties = $this->productPropertyRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s مشخصه محصول به کد %s به مقدار %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$productProperties->id,$productProperties->value),$request);}
         return $this->sendResponse($productProperties->toArray(), 'Product Property saved successfully');
     }
 
@@ -225,9 +226,9 @@ class ProductPropertyAPIController extends AppBaseController
         if (empty($productProperty)) {
             return $this->sendError('Product Property not found');
         }
-
+        $oldValue = $productProperty->value;
         $productProperty = $this->productPropertyRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s مشخصه محصول به کد %s از مقدار %s به مقدار %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$productProperty->id,$oldValue,$productProperty->value),$request);}
         return $this->sendResponse($productProperty->toArray(), 'ProductProperty updated successfully');
     }
 
@@ -269,7 +270,7 @@ class ProductPropertyAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var ProductProperty $productProperty */
         $productProperty = $this->productPropertyRepository->findWithoutFail($id);
@@ -279,7 +280,7 @@ class ProductPropertyAPIController extends AppBaseController
         }
 
         $productProperty->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s مشخصه محصول به کد %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$productProperty->id),$request);}
         return $this->sendResponse($id, 'Product Property deleted successfully');
     }
 }

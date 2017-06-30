@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateSubCategoryAPIRequest;
 use App\Http\Requests\API\UpdateSubCategoryAPIRequest;
+use App\Models\LOG;
 use App\Models\SubCategory;
 use App\Repositories\SubCategoryRepository;
 use Illuminate\Http\Request;
@@ -115,7 +116,7 @@ class SubCategoryAPIController extends AppBaseController
         $input = $request->all();
 
         $subCategories = $this->subCategoryRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s زیردسته %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$subCategories->name),$request);}
         return $this->sendResponse($subCategories->toArray(), 'Sub Category saved successfully');
     }
 
@@ -227,7 +228,7 @@ class SubCategoryAPIController extends AppBaseController
         }
 
         $subCategory = $this->subCategoryRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s زیردسته %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$subCategory->name),$request);}
         return $this->sendResponse($subCategory->toArray(), 'SubCategory updated successfully');
     }
 
@@ -269,17 +270,17 @@ class SubCategoryAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         /** @var SubCategory $subCategory */
         $subCategory = $this->subCategoryRepository->findWithoutFail($id);
-
+        $sc = $subCategory;
         if (empty($subCategory)) {
             return $this->sendError('Sub Category not found');
         }
 
         $subCategory->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s زیردسته %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$sc->name),$request);}
         return $this->sendResponse($id, 'Sub Category deleted successfully');
     }
 }

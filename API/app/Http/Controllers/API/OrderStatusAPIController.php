@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateOrderStatusAPIRequest;
 use App\Http\Requests\API\UpdateOrderStatusAPIRequest;
+use App\Models\LOG;
 use App\Models\OrderStatus;
 use App\Repositories\OrderStatusRepository;
 use Illuminate\Http\Request;
@@ -111,7 +112,7 @@ class OrderStatusAPIController extends AppBaseController
         $input = $request->all();
 
         $orderStatuses = $this->orderStatusRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s نوع سفارش %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$orderStatuses->name),$request);}
         return $this->sendResponse($orderStatuses->toArray(), 'Order Status saved successfully');
     }
 
@@ -223,7 +224,7 @@ class OrderStatusAPIController extends AppBaseController
         }
 
         $orderStatus = $this->orderStatusRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s نوع سفارش %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$orderStatus->name),$request);}
         return $this->sendResponse($orderStatus->toArray(), 'OrderStatus updated successfully');
     }
 
@@ -265,17 +266,17 @@ class OrderStatusAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var OrderStatus $orderStatus */
         $orderStatus = $this->orderStatusRepository->findWithoutFail($id);
-
+        $os = $orderStatus;
         if (empty($orderStatus)) {
             return $this->sendError('Order Status not found');
         }
 
         $orderStatus->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s نوع سفارش %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$os->name),$request);}
         return $this->sendResponse($id, 'Order Status deleted successfully');
     }
 }

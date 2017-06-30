@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateFactorsAPIRequest;
 use App\Http\Requests\API\UpdateFactorsAPIRequest;
 use App\Models\Factors;
+use App\Models\LOG;
 use App\Models\Product;
 use App\Models\ProductProperty;
 use App\Repositories\FactorsRepository;
@@ -131,7 +132,7 @@ class FactorsAPIController extends AppBaseController
         $input = $request->all();
 
         $factors = $this->factorsRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور به شماره %s را ایجاد کرده است.",$request->user()->fname." ".$request->user()->lname,$factors->id),$request);}
         return $this->sendResponse($factors->toArray(), 'Factors saved successfully');
     }
 
@@ -243,7 +244,7 @@ class FactorsAPIController extends AppBaseController
         }
 
         $factors = $this->factorsRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور به شماره %s را به روز رسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$factors->id),$request);}
         return $this->sendResponse($factors->toArray(), 'Factors updated successfully');
     }
 
@@ -285,17 +286,17 @@ class FactorsAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var Factors $factors */
         $factors = $this->factorsRepository->findWithoutFail($id);
-
+        $fact = $factors;
         if (empty($factors)) {
             return $this->sendError('Factors not found');
         }
 
         $factors->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور به شماره %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$fact->id),$request);}
         return $this->sendResponse($id, 'Factors deleted successfully');
     }
 }

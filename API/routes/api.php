@@ -23,11 +23,11 @@ Route::post('login','AuthController@login');
 # This Function Available From In Site (Just Loggedin User), This Mean Just Admin Can Registered a user (Admin , Stockman , Accountant , Seller)
 Route::post('register','AuthController@register');
 
+//Route::resource('user_types', 'API\UserTypeAPIController');
 
-
-Route::resource('user_types', 'API\UserTypeAPIController');
-
-Route::resource('users', 'API\UserAPIController');
+Route::resource('users', 'API\UserAPIController', ['except' => [
+    'store', 'update','create','destroy'
+]]);
 
 Route::resource('products', 'API\ProductAPIController');
 

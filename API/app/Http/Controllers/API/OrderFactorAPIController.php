@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateOrderFactorAPIRequest;
 use App\Http\Requests\API\UpdateOrderFactorAPIRequest;
+use App\Models\LOG;
+use App\Models\Order;
 use App\Models\OrderFactor;
 use App\Repositories\OrderFactorRepository;
 use Illuminate\Http\Request;
@@ -113,11 +115,29 @@ class OrderFactorAPIController extends AppBaseController
      */
     public function store(CreateOrderFactorAPIRequest $request)
     {
-        $input = $request->all();
-
-        $orderFactors = $this->orderFactorRepository->create($input);
-
-        return $this->sendResponse($orderFactors->toArray(), 'Order Factor saved successfully');
+        $OrderFactorInfo = $request->except('orders');
+        $orderFactor = $this->orderFactorRepository->create($OrderFactorInfo);
+        if(empty($orderFactor)){
+            return $this->sendError('OrderFactor Not Created!');
+        }
+        if($request->has('orders')){
+            $orders = $request->only('orders');
+            if(is_string($orders['orders'])){
+                $pp = json_decode($orders['orders'],true);
+            }else{
+                $pp = $orders['orders'];
+            }
+            if($pp !== null){
+                for ($i = 0 ; $i < count($pp) ; $i++){
+                    $pp[$i] += array('orderFactor' => $orderFactor->id);
+                }
+            }
+            //return $pp;
+            // Here insert Order
+            DB::table('Order')->insert($pp);
+        }
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور سفارش به شماره %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$orderFactor->id),$request);}
+        return $this->sendResponse($request->all(), 'Order Factor saved successfully');
     }
 
     /**
@@ -218,17 +238,33 @@ class OrderFactorAPIController extends AppBaseController
      */
     public function update($id, UpdateOrderFactorAPIRequest $request)
     {
-        $input = $request->all();
-
-        /** @var OrderFactor $orderFactor */
         $orderFactor = $this->orderFactorRepository->findWithoutFail($id);
-
-        if (empty($orderFactor)) {
-            return $this->sendError('Order Factor not found');
+        if(empty($orderFactor)){
+            return $this->sendError('OrderFactor Not Found!');
         }
 
-        $orderFactor = $this->orderFactorRepository->update($input, $id);
+        $OrderFactorInfo = $request->except('orders');
+        $orderFactor = $this->orderFactorRepository->update($OrderFactorInfo, $id);
 
+        // Here is kOs kharingO namOsan !
+        if($request->has('orders')){
+            $orders = $request->only('orders');
+            if(is_string($orders['orders'])){
+                $pp = json_decode($orders['orders'],true);
+            }else{
+                $pp = $orders['orders'];
+            }
+            # Delete All ROWs and re Define them!
+            Order::where('product',$id)->delete();
+            if($pp !== null){
+                for ($i = 0 ; $i < count($pp) ; $i++){
+                    $pp[$i] += array('orderFactor' => $orderFactor->id);
+                    unset($pp[$i]['id']);
+                }
+            }
+            DB::table('Order')->insert($pp);
+        }
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور سفارش به شماره %s را بروزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$orderFactor->id),$request);}
         return $this->sendResponse($orderFactor->toArray(), 'OrderFactor updated successfully');
     }
 
@@ -270,17 +306,17 @@ class OrderFactorAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var OrderFactor $orderFactor */
         $orderFactor = $this->orderFactorRepository->findWithoutFail($id);
-
+        $of = $orderFactor;
         if (empty($orderFactor)) {
             return $this->sendError('Order Factor not found');
         }
 
         $orderFactor->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور سفارش به شماره %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$of->id),$request);}
         return $this->sendResponse($id, 'Order Factor deleted successfully');
     }
 }

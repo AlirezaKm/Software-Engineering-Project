@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\API;
-
+use Carbon\Carbon;
 use App\Http\Requests\API\CreateUserAPIRequest;
 use App\Http\Requests\API\UpdateUserAPIRequest;
 use App\Models\User;
+use App\Models\LOG;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -24,7 +26,9 @@ class UserAPIController extends AppBaseController
 
     public function __construct(UserRepository $userRepo)
     {
+
         $this->userRepository = $userRepo;
+
     }
 
     /**
@@ -64,7 +68,6 @@ class UserAPIController extends AppBaseController
         $this->userRepository->pushCriteria(new RequestCriteria($request));
         $this->userRepository->pushCriteria(new LimitOffsetCriteria($request));
         $users = $this->userRepository->all();
-
         return $this->sendResponse($users->toArray(), 'Users retrieved successfully');
     }
 
@@ -111,7 +114,7 @@ class UserAPIController extends AppBaseController
         $input = $request->all();
 
         $users = $this->userRepository->create($input);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s حسابی برای %s ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$users->fname." ".$users->lname),$request);}
         return $this->sendResponse($users->toArray(), 'User saved successfully');
     }
 
@@ -223,7 +226,7 @@ class UserAPIController extends AppBaseController
         }
 
         $user = $this->userRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s حساب %s را به روز رسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$user->fname." ".$user->lname),$request);}
         return $this->sendResponse($user->toArray(), 'User updated successfully');
     }
 
@@ -265,17 +268,17 @@ class UserAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var User $user */
         $user = $this->userRepository->findWithoutFail($id);
-
+        $u = $user;
         if (empty($user)) {
             return $this->sendError('User not found');
         }
 
         $user->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s حساب %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$u->fname." ".$u->lname),$request);}
         return $this->sendResponse($id, 'User deleted successfully');
     }
 }

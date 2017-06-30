@@ -29,8 +29,10 @@ class AuthController extends Controller
             'email'     => trim($req->input('username')),
             'password'  => trim($req->input('password'))
         ];
-
-        if(Auth::attempt($input_info) == false){
+        /*
+         *
+         */
+        if(!Auth::attempt($input_info)){
             return Response::json(ResponseUtil::makeError(Farsi::$USER_NOT_FOUND));
         }else {
             $user = Auth::user();

@@ -64,7 +64,8 @@ class Factors extends Model
      * @var array
      */
     public static $rules = [
-        
+        'seller' => 'required|numeric',
+        'date' => 'required|date'
     ];
 
     /**

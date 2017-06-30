@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateCategoryAPIRequest;
 use App\Http\Requests\API\UpdateCategoryAPIRequest;
 use App\Models\Category;
+use App\Models\LOG;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Controller\AppBaseController;
@@ -109,9 +110,10 @@ class CategoryAPIController extends AppBaseController
     public function store(CreateCategoryAPIRequest $request)
     {
         $input = $request->all();
-
         $categories = $this->categoryRepository->create($input);
-
+        if(LOG::$log_is_on) {
+            LOG::infoReq(sprintf("کاربر %s دسته %s را ایجاد کرده است.", $request->user()->fname . " " . $request->user()->lname, $categories->name), $request);
+        }
         return $this->sendResponse($categories->toArray(), 'Category saved successfully');
     }
 
@@ -223,7 +225,7 @@ class CategoryAPIController extends AppBaseController
         }
 
         $category = $this->categoryRepository->update($input, $id);
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s دسته %s را به روزرسانی کرده است.",$request->user()->fname." ".$request->user()->lname,$category->name),$request);}
         return $this->sendResponse($category->toArray(), 'Category updated successfully');
     }
 
@@ -265,17 +267,17 @@ class CategoryAPIController extends AppBaseController
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
         /** @var Category $category */
         $category = $this->categoryRepository->findWithoutFail($id);
-
+        $cat = $category;
         if (empty($category)) {
             return $this->sendError('Category not found');
         }
 
         $category->delete();
-
+        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s دسته %s را حذف کرده است.",$request->user()->fname." ".$request->user()->lname,$cat->name),$request);}
         return $this->sendResponse($id, 'Category deleted successfully');
     }
 }

@@ -103,7 +103,13 @@ class Product extends Model
      * @var array
      */
     public static $rules = [
-        
+        'factor' => 'required|numeric',
+        'name' => 'required|string',
+        'category' => 'required|numeric',
+        'subcategory' => 'required|numeric',
+        'count' => 'required|numeric',
+        'buyPrice' => 'required',
+        'sellPrice' => 'required'
     ];
 
     /**
