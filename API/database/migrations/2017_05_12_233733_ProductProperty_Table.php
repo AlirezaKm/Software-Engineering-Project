@@ -17,6 +17,7 @@ class ProductPropertyTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('product');
             $table->unsignedInteger('property');
+            $table->string('value');
             $table->timestamps();
             $table->softDeletes();
             # Foreign Keys

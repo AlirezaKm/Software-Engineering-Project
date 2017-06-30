@@ -26,6 +26,13 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Passport::routes();
+        //Passport::routes();
+
+        Passport::tokensCan([
+            'stockman' => 'Authenticate of Stockman' ,
+            'accountant' => 'Authenticate of Accountant' ,
+            'seller' => 'Authenticate of Seller' ,
+            'admin' => 'Authenticate of Admins',
+        ]);
     }
 }
