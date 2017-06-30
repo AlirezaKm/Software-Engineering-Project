@@ -1,0 +1,210 @@
+login:
+	params:
+		username:string
+		password:string
+	receive:
+		success:boolean
+		message:string
+		user_type:integer
+		access_token:string
+		
+register:
+	params:
+		fname:string
+		lname:string
+		username:string
+		password:string
+		respassword:string
+		email:email
+		type:integer
+	receive:
+		success:boolean
+		message:string
+		
+getUserTypes:
+	params:
+		access_token:string
+	receive:
+		user_types:[
+			{
+				id:integer
+				name:string
+			}
+			...
+		]
+		
+create_product:
+	params:
+		name:string
+		category_id:integer
+		sub_category_id:integer
+		count:integer (indicate how many numbers of This product exists)
+		sell_price:float
+		buy_price:float
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+
+edit_product:
+	params: // some params may does not exist in request, just edit params which exists in request
+		name:string
+		category_id:integer
+		sub_category_id:integer
+		count:integer (indicate how many numbers of This product exists)
+		sell_price:float
+		buy_price:float
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+
+edit_product_properties:
+	params: // some params may does not exist in request, just change edit ther params which exists in request
+		product_code:string
+		properties:[
+			{
+				property_id:integer,
+				value:string
+			}
+		]
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+
+		
+get_products:
+	params:
+		series:integer (1=> first 10 last products, 2=> second 10 last products , ...)
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+		products[
+			{
+				code:string
+				name:string
+				category:string
+				sub_category:string
+				count:integer (indicate how many numbers of This product exists)
+				sell_price:float
+			}
+			....
+		]
+		
+search_products:
+	params:
+		name:string
+		numberOfResults:integer
+		access_token
+	receive:
+		success:boolean
+		message:string
+		products[
+			{
+				code:string
+				name:string
+				category:string
+				subCategory:string
+				count:integer (indicate how many numbers of This product exists)
+				sellPrice:float
+			}
+			....
+		]
+		
+get_factors:
+	params:
+		series:integer (1=> first 10 last results, 2=> second 10 last results , ...)
+		withSumCount:boolean
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+		factors:[
+			{
+				id:
+				seller:string
+				date:string
+				
+				// contain below variables if withSumCount is true
+				sum:float (indicate the sum price of all products for this factor)
+				count:integer (indicate how many products this factor contain)
+			}
+			....
+		]
+
+create_factor:
+	params:
+		seller:string,
+		date:string
+	receive:
+		success:boolean
+		message:string
+
+get_categories:
+	params:		
+		access_token:string
+	receive: 
+		success:boolean
+		message:string
+		categories[
+			{
+				id:integer,
+				name:string
+			}
+		]
+		
+create_category:
+	params:
+		name:string
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+
+		
+get_sub_categories:
+	params:
+		category_id:integer
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+		sub_categories:[
+			{
+				id:integer
+				name:string
+			}
+		]
+
+create_sub_category:
+	params:
+		category_id:integer
+		name:string
+		access_token:string
+	receive:
+		success:boolean
+		message:string
+		
+get_properties:
+	params:
+		sub_category_id:integer
+		access_token:string
+	receive: (array Of Properties)
+		success:boolean
+		message:string
+		[
+			{
+				id:integer
+				name:string
+			}
+		]
+
+create_property:
+	params:
+		name:string
+		access_token:string
+	receive:
+		success:boolean
+		message:string
