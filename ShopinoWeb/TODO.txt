@@ -1,4 +1,0 @@
-HomePage: 
--fix responsive
--seperate components
--make buttons work
