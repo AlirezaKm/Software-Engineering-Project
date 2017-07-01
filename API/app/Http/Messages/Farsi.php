@@ -12,4 +12,5 @@ class Farsi{
     static $USER_NOT_FOUND = "User Not Found";
     static $USER_LOGGED_IN = "User Successfuly Logged in";
     static $USER_REGISTERED = "User Successfuly Registered";
+    static $USER_LOGGED_OUT = "User Successfuly Logged Out";
 }

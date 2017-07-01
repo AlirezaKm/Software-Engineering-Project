@@ -23,6 +23,8 @@ Route::post('login','AuthController@login');
 Route::middleware(['auth:api'])->group(function (){
 
 # This Function Available From In Site (Just Loggedin User), This Mean Just Admin Can Registered a user (Admin , Stockman , Accountant , Seller)
+    Route::any('logout','AuthController@logout');
+
     Route::post('register','AuthController@register');
  /*
  * scope : stockman , admin , accountant , seller

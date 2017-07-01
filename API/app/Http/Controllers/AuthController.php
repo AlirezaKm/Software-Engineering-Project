@@ -89,4 +89,9 @@ class AuthController extends Controller
 
         return Response::json(ResponseUtil::makeResponse(Farsi::$USER_REGISTERED, $user));
     }
+
+    function logout(Request $req){
+        DB::table('oauth_access_tokens')->where('user_id', $req->user()->id)->where('revoked', 0)->update(['revoked' => 1]);
+        return ResponseUtil::makeResponse(Farsi::$USER_LOGGED_OUT, []);
+    }
 }
