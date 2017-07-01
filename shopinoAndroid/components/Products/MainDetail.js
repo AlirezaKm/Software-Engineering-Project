@@ -2,10 +2,16 @@ import React,{Component} from 'react'
 import {DatePickerAndroid} from 'react-native'
 import {Picker,Item,Button,Icon,View,Input,Toast} from 'native-base'
 import {connect} from 'react-redux'
-import {Card,Text,Field} from '../common'
+import {Card,Text,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import Tab from './Tab'
-import {changeNewProduct,changeSelectedCategory,changeSelectedSubCategory} from '../../actions'
+import {
+    changeNewProduct,
+    changeSelectedCategory,
+    changeSelectedSubCategory,
+    loadFactors,
+    loadCategories} 
+from '../../actions'
 import FactorModal from './FactorModal'
 import CategoryModal from './CategoryModal'
 import SubCategoryModal from './SubCategoryModal'
@@ -24,19 +30,17 @@ class MainDetail extends Component{
             selectedCategory:-1,
             selectedSubCategory:-1
         }
-        this.setModalVisible = this.setModalVisible.bind(this);
-        this.changeProductInfo = this.changeProductInfo.bind(this);
-        this.onFactorChanged = this.onFactorChanged.bind(this);
-        this.onCategoryChanged = this.onCategoryChanged.bind(this);
-        this.onSubCategoryChanged = this.onSubCategoryChanged.bind(this);
+    }
+    componentWillMount(){
+        this.props.loadInfo();
     }
     componentDidMount(){
         console.log('onComponentDidMount called');
         const {edit} = this.props;
         if(edit.code){
-            this.onFactorChanged(edit.factorId);
-            this.onCategoryChanged(edit.categoryId);
-            this.onSubCategoryChanged(edit.subCategoryId);
+            this.onFactorChanged(edit.factor.id);
+            this.onCategoryChanged(edit.category.id);
+            this.onSubCategoryChanged(edit.subcategory.id);
         }
     }
     setModalVisible(modal,visible){
@@ -66,7 +70,7 @@ class MainDetail extends Component{
             this.setState({
                 selectedFactor:value
             },
-            ()=>this.changeProductInfo('factorId',this.state.selectedFactor)
+            ()=>this.changeProductInfo('factor',this.state.selectedFactor)
             );
         }
     }
@@ -77,7 +81,7 @@ class MainDetail extends Component{
             this.setState({
                 selectedCategory:value
             },()=>
-                this.changeProductInfo('categoryId',this.state.selectedCategory)
+                this.changeProductInfo('category',this.state.selectedCategory)
             );
         }
     } 
@@ -89,22 +93,30 @@ class MainDetail extends Component{
             this.setState({
                 selectedSubCategory:value
             },()=>
-                this.changeProductInfo('subCategoryId',this.state.selectedSubCategory)
+                this.changeProductInfo('subcategory',this.state.selectedSubCategory)
             );
         }
     }
     render(){
-        const {factors,categories,selectedSubCategories,changeCategory,error,edit} = this.props;
+        const {
+            factors,
+            categories,
+            selectedSubCategories,
+            changeCategory,
+            error,
+            edit,
+            loadingFactors,
+            loadingCategories,
+            loadingSubCategories
+        } = this.props;
         const {factorModal,categoryModal,subCategoryModal} = this.state;
-        
-        console.log('selectedFactor:', this.state.selectedFactor);
 
         const chooseItem = <Item label='انتخاب کنید' value="-1" key={-1} disabled/>;
 
         const factorItems = [
             chooseItem,
             ...factors.map((item,index)=>
-            <Item label={''+ item.seller +' '+ item.date.year+'/'+item.date.month+'/'+item.date.day} value={item.id} key={index}/>)
+            <Item label={''+ item.seller.name +' '+ item.date} value={item.id} key={index}/>)
         ];
 
         const categoryItems=[
@@ -133,6 +145,7 @@ class MainDetail extends Component{
 
                     <Card column>
                         <Field 
+                            load={loadingFactors}
                             icon="md-cart" 
                             label="فاکتور"
                             error={error.factorId?error.factorId:null}>
@@ -160,6 +173,7 @@ class MainDetail extends Component{
                             placeholder="مثلا شلوار جین ترک"
                             error={error.name?error.name:null}/>
                         <Field
+                            load={loadingCategories}
                             icon="md-bookmark"
                             label="دسته"
                             error={error.categoryId?error.categoryId:null}>
@@ -175,8 +189,9 @@ class MainDetail extends Component{
                             <Button transparent small style={{alignSelf:'center'}} onPress={()=>this.setModalVisible('categoryModal',true)}>
                                 <Icon name="add-circle" style={{color:colors.accent}}/>
                             </Button>
-                        </Field>                     
+                        </Field>                                        
                         <Field
+                            load={loadingSubCategories}
                             icon="md-bookmark"
                             label="زیر دسته"
                             error={error.subCategoryId?error.subCategoryId:null}>
@@ -197,7 +212,7 @@ class MainDetail extends Component{
                                         this.setModalVisible('subCategoryModal',true)
                                     }
                                     else{
-                                        this.onCategoryChanged();
+                                        this.changeProductInfo('category',-1);
                                     }
                                 }}>
                                 <Icon name="add-circle" style={{color:colors.accent}}/>
@@ -210,11 +225,14 @@ class MainDetail extends Component{
 }
 const mapStateTopProps = (state,ownProps)=>{    
     return {
+        loadingFactors:state.loadingFactors,
+        loadingCategories:state.loadingCategories,
+        loadingSubCategories:state.loadingSubCategories,
         error:state.error,
         message:state.message,
         factors:state.factors,
         categories:state.categories,
-        selectedSubCategories:state.subCategories.filter((item)=> item.categoryId == state.selectedCategory),
+        selectedSubCategories:state.subCategories,
         edit:state.newProduct
     }
 }
@@ -227,6 +245,10 @@ const mapDispatchToProps = (dispatch,ownProps)=>({
     },
     changeSubCategory:(subCategoryId)=>{
         dispatch(changeSelectedSubCategory(subCategoryId));
+    },
+    loadInfo:()=>{
+        dispatch(loadCategories());
+        dispatch(loadFactors());
     }
 })
 export default connect(mapStateTopProps,mapDispatchToProps)(MainDetail)

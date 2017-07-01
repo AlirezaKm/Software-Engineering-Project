@@ -1,37 +1,41 @@
 import React,{Component} from 'react'
 import {connect} from 'react-redux'
 import {View} from 'native-base'
-import {Text,CardRow} from '../common'
-
+import {Text,CardRow,Load} from '../common'
+import {loadOrders} from '../../actions'
 class OrderFactorDetail extends Component{
     /*static navigationOptions = ({navigation})=>({
         title:navigation.state.params.title
     })*/
+    componentWillMount(){
+        this.props.load();
+    }
     static navigationOptions = {
         title:'جزییات سفارش'
     }
     render(){
-        const {orders} = this.props;
+        const {wait,error,orders} = this.props;
+        console.log('orders:',orders);  
         ordersView = orders.map(
-            ({code,name,sellPrice,count,category,subCategory})=>
+            ({code,product})=>
             <CardRow
                 key={code}
-                title={name}
+                title={product.name}
                 icon="pricetag" 
-                ItemOne={category}
-                ItemTwo={subCategory}
-                badgeTop={sellPrice + 'تومان'} 
-                badgeBottom={count + 'عدد'}
+                ItemOne={product.category.name}
+                ItemTwo={product.subcategory.name}
+                badgeTop={product.sellPrice + ' تومان'} 
+                badgeBottom={product.count + ' عدد'}
             />)
         return(
-            <View>
+            <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>
                 {ordersView}
-            </View>         
+            </Load>         
         )
     }
 }
 
-const mapStateTopProps = (state,ownProps)=>{
+/*const mapStateTopProps = (state,ownProps)=>{
 
     const selectedOrders = state.orders.filter(item=> item.orderFactorCode === state.selectedOrderFactor);
 
@@ -58,6 +62,16 @@ const mapStateTopProps = (state,ownProps)=>{
     return {
         orders:orders
     }
-};
+};*/
+const mapStateTopProps = (state,ownProps)=>({
+    wait:state.waitForResponse,
+    error:state.error.orders,
+    orders:state.orders
+})
+const mapDispatchToProps = (dispatch,ownProps)=>({
+    load:()=>{
+        dispatch(loadOrders());
+    }
+})
 
-export default connect(mapStateTopProps)(OrderFactorDetail)
+export default connect(mapStateTopProps,mapDispatchToProps)(OrderFactorDetail)

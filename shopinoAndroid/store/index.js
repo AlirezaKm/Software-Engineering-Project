@@ -4,6 +4,6 @@ import reducers from '../reducers'
 import initialState from './initialState.json'
 
 export default applyMiddleware(thunk)(createStore)(
-    reducers,
-    initialState
+    reducers/*,
+    initialState*/
 );

@@ -1,11 +1,11 @@
 import React,{Component} from 'react'
 import {DatePickerAndroid} from 'react-native'
 import {Button} from 'native-base'
-import {Text,Card,CardItem,Field} from '../common'
+import {Text,Card,CardItem,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import Modal from '../Modal'
 import {connect} from 'react-redux'
-import {changeNewFactor,addFactor} from '../../actions'
+import {changeNewFactor,addFactor,cleanError,cleanNewFactor} from '../../actions'
 
 class FactorModal extends Component{ 
     constructor(props){
@@ -30,12 +30,8 @@ class FactorModal extends Component{
             });
             if(action !== DatePickerAndroid.dismissedAction){
                 this.setState({
-                    date:{
-                        year:year,
-                        month:month,
-                        day:day
-                    }
-                })
+                    date:year+'-'+month+'-'+day                    
+                });
                 this.changeFactorInfo('date',this.state.date);
             }
         }
@@ -44,14 +40,24 @@ class FactorModal extends Component{
         }
     }
     render(){
-        const {visible,setVisible,error,createFactor,message} = this.props;
+        const {wait,visible,setVisible,error,createFactor,message,clean} = this.props;
         const {date} = this.state;
+        const onFade = ()=>clean();
+        if(message){
+            this.timer = setTimeout(()=>{
+                setVisible(false);
+                onFade();
+                this.timer = null;
+            },1000);
+        }
         return(
             <Modal
                 title="اضافه کردن فاکتور" 
                 visible={visible}
-                setVisible={setVisible}>
+                setVisible={setVisible}
+                onFade={onFade}>
                 <Card column>
+                    {message&&<Text success background>{message}</Text>}
                     <Field
                         icon="add"
                         label="خرید از"
@@ -65,19 +71,16 @@ class FactorModal extends Component{
                         error={error.date?error.date:null}
                     >
                         <Button transparent onPress={()=>this.showDatePicker()}>
-                            <Text> {date?date.year+':'+date.month+':'+date.day:'انتخاب کنید'} </Text>
+                            <Text> {date?date:'انتخاب کنید'} </Text>
                         </Button>
                     </Field>
-                    <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} onPress={()=>{
-                        createFactor();
-                        setTimeout(()=>{
-                            if(message.factor){
-                                setVisible(false);
-                            }
-                        },2000);
-                    }}>
+                    <SimpleLoad wait={wait}>
+                        <Button block rounded style={{backgroundColor:colors.accent,marginHorizontal:8}} onPress={()=>{
+                            createFactor();
+                        }}>
                         <Text> ثبت </Text>
-                    </Button>
+                        </Button>
+                    </SimpleLoad>
                 </Card>
             </Modal>
             );
@@ -85,8 +88,9 @@ class FactorModal extends Component{
 }
 
 const mapStateToProps =(state,ownProps)=>({
+    wait:state.waitForResponse,
     error:state.error,
-    message:state.message,
+    message:state.message.factors,
     newFactor:state.newFactor
 });
 const mapDispatchToProps = (dispatch,ownProps)=>({
@@ -95,6 +99,11 @@ const mapDispatchToProps = (dispatch,ownProps)=>({
     },
     createFactor:()=>{
         dispatch(addFactor());
+    },
+    clean:()=>{
+        dispatch(cleanNewFactor());
+        dispatch(cleanError('seller'));
+        dispatch(cleanError('date'));
     }
 });
 

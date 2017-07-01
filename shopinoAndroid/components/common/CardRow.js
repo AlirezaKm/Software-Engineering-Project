@@ -7,10 +7,10 @@ import {colors} from '../styles'
 
 class CardRow extends Component{
     render(){
-        const {title,icon,ItemOne,ItemTwo,badgeTop,badgeBottom,onPress} = this.props;
+        const {title,icon,ItemOne,ItemTwo,badgeTop,badgeBottom,onPress,onLongPress} = this.props;
         return (            
             <Card column>
-                <CardItem onPress={onPress}>
+                <CardItem onPress={onPress} onLongPress={onLongPress}>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}> 
                         <View style={{flexDirection:'row'}}>
                         <Icon name={icon} style={{color:colors.primary,margin:2}}/>               

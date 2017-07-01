@@ -11,7 +11,7 @@ const Landing = ({children}) =>
     <Container style={styles.container}>
         <Image source={logo} style={styles.logo}/>
         <Text style={styles.text}>سیستم مدیریت فروشگاه</Text>
-        <H3 style={styles.appName}>پویان</H3>
+        <H3 style={styles.appName}>شاپینو</H3>
         {children}        
     </Container>
 

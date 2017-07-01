@@ -1,46 +1,53 @@
 import React,{Component} from 'react'
 import {View} from 'native-base'
-import {Text,CardRow} from '../common'
+import {Text,CardRow,Load} from '../common'
 import {connect} from 'react-redux'
-import {changeSelectedOrderFactor} from '../../actions'
+import {changeSelectedOrderFactor,loadOrderFactors} from '../../actions'
 
 class OrderFactors extends Component{
 
+    componentWillMount(){
+        this.props.load();
+    }
     render(){
-        const {orderFactors,changeOrderFactor,navigate,title} = this.props;
+        const {wait,error,orderFactors,changeOrderFactor,navigate,title} = this.props;
 
-        orderFactorViews = orderFactors.map(
-            ({code,status,count,sum,create_date_time})=>{
-                const {year,month,day} = create_date_time;
+        const orderFactorViews = orderFactors.map(
+            ({id,status,count,sum,created_at})=>{
                 return (
                     <CardRow 
-                        key={code}
-                        title={code+"#"}
+                        key={id}
+                        title={id+"#"}
                         icon="pricetag" 
                         ItemOne={status == 1 ? 'پرداخت شده':'معوق'}
                         ItemTwo={count + 'عدد'}
                         badgeTop={sum + 'تومان'} 
-                        badgeBottom={year?year+'/'+month+'/'+day:create_date_time}
+                        badgeBottom={created_at}
                         onPress={()=>{
-                            changeOrderFactor(code);
-                            navigate('OrderFactorDetail',{title:code+'فاکتور شماره '});
+                            changeOrderFactor(id);
+                            navigate('OrderFactorDetail',{title:id+'فاکتور شماره '});
                         }}/>
         )});
 
         return (
-            <View>                
+            <Load wait={wait} error={wait?null:error} onError={()=>this.props.load()}>              
                 {orderFactorViews}
-            </View>
+            </Load>
         );
     }
 }
 const mapStateToProps =(state,ownProps)=>({
+    wait:state.waitForResponse,
+    error:state.error.orderFactors,
     orderFactors:state.orderFactors
 })
 
 const mapDispatchToProps = (dispatch,ownProps)=>({
     changeOrderFactor:(orderFactorCode)=>{
         dispatch(changeSelectedOrderFactor(orderFactorCode));
+    },
+    load:()=>{
+        dispatch(loadOrderFactors());
     }
 })
 

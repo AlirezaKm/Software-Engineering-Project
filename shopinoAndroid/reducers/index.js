@@ -10,23 +10,67 @@ const maxId =(state)=>{
     }
     return maxId;
 }
-export const navigate= (state=null,action)=>{
+export const navigation= (state=null,action)=>{
     if(action.type === C.SET_NAVIGATE)
         return action.payload;
     else
         return state;
 }
 export const waitForResponse = (state=false,action)=>{
+    console.log('reducers:waitForResponse');
     switch(action.type){
-        case C.SEND_AUTH_REQUEST:
+        case C.SEND_REQUEST:
+            console.log('reducers:waitForResponse:',true);
             return true;        
         case C.RECEIVE_RESPONE:
+            console.log('reducers:waitForResponse:',false);
             return false;
         default:
             return state;
     }
 }
 
+export const loadingCategories = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_CATEGORIES:            
+            return true;        
+        case C.RECEIVE_RESPONE_CATEGORIES:            
+            return false;
+        default:
+            return state;
+    }
+}
+export const loadingSubCategories = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_SUBCATEGORIES:            
+            return true;        
+        case C.RECEIVE_RESPONE_SUBCATEGORIES:            
+            return false;
+        default:
+            return state;
+    }
+}
+
+export const loadingFactors = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_FACTORS:            
+            return true;        
+        case C.RECEIVE_RESPONE_FACTORS:            
+            return false;
+        default:
+            return state;
+    }
+}
+export const loadingProperties = (state=false,action)=>{
+    switch(action.type){
+        case C.SEND_REQUEST_PROPERTY:            
+            return true;        
+        case C.RECEIVE_RESPONE_PROPERTY:            
+            return false;
+        default:
+            return state;
+    }
+}
 export const userInfo = (state={},action)=>{
     switch(action.type){
         case C.CHANGE_USER_INFO:
@@ -59,19 +103,25 @@ export const message = (state={},action)=>{
 }
 
 export const newCategory=(state={},action)=>{
-    if(action.type === C.CHANGE_NEW_CATEGORY){
-        return Object.assign({},state,action.payload);
+    switch(action.type){
+        case C.CHANGE_NEW_CATEGORY:
+            return Object.assign({},state,action.payload);
+        case C.CLEAN_NEW_CATEGORY:
+            return {};
+        default:
+            return state;
     }
-    else
-        return state;
 }
 
 export const newSubCategory=(state={},action)=>{
-    if(action.type === C.CHANGE_NEW_SUB_CATEGORY){
-        return Object.assign({},state,action.payload);
+    switch(action.type){
+        case C.CHANGE_NEW_SUB_CATEGORY:
+            return Object.assign({},state,action.payload);
+        case C.CLEAN_NEW_SUB_CATEGORY:
+            return {};
+        default:
+            return state;
     }
-    else
-        return state;
 }
 
 export const categories = (state=[],action)=>{
@@ -107,6 +157,8 @@ export const categories = (state=[],action)=>{
                     name:name
                 }
             ]
+        case C.LOAD_CATEGORIES:
+            return action.payload;
         default:
             return state;
     }
@@ -149,6 +201,8 @@ export const subCategories = (state=[],action)=>{
                     name:name
                 }
             ]
+        case C.LOAD_SUBCATEGORIES:
+            return action.payload;
         default:
             return state;
     }
@@ -175,7 +229,8 @@ export const properties = (state=[],action)=>{
                     name:name
                 }
             ];            
-
+        case C.LOAD_PROPERTIES:
+            return action.payload;
         default:
             return state;
     }
@@ -230,6 +285,8 @@ export const products = (state=[],action)=>{
             ]            
         case C.REMOVE_PRODUCT:
             return state.filter(item=> item.code !== action.payload);
+        case C.LOAD_PRODUCTS:
+            return action.payload;
         default:
             return state;
     }
@@ -258,6 +315,8 @@ export const factors = (state=[],action)=>{
                     create_date_time:create_date_time
                 }
             ];
+        case C.LOAD_FACTORS:
+            return action.payload;
         default:
             return state;
     }
@@ -303,7 +362,6 @@ export const selectedProduct = (state = 0, action)=>{
 
 export const selectedOrderFactor = (state=0,action)=>{
     if(action.type === C.CHANGE_SELECTED_ORDER_FACTOR){
-        console.log('reducer:selectedOrderFactor:',action.payload);
         return action.payload;
     }
     else{
@@ -332,6 +390,8 @@ export const users = (state=[],action)=>{
                     create_date_time:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
                 }                
             ]
+        case C.LOAD_USERS:
+            return action.payload;
         default:
             return state;
     }
@@ -349,11 +409,14 @@ export const newUser = (state={},action)=>{
 }
 
 export const newFactor=(state={},action)=>{
-    if(action.type === C.CHANGE_NEW_FACTOR){
-        return Object.assign({},state,action.payload);
+    switch(action.type){
+        case C.CHANGE_NEW_FACTOR:
+            return Object.assign({},state,action.payload);
+        case C.CLEAN_NEW_FACTOR:
+            return {};
+        default:
+            return state;
     }
-    else
-        return state;
 }
 
 export const newProperty=(state={},action)=>{
@@ -400,11 +463,11 @@ export const newProductProperty = (state=[],action)=>{
         case C.ADD_NEW_PRODUCT_PROPERTY:
             console.log('newProdcutProperty:',state);
             console.log('newProdcutProperty:payload: ',action.payload);
-            const exist = state.find(item=> item.propertyId === action.payload.propertyId);
+            const exist = state.find(item=> item.property === action.payload.property);
             if(exist){
                 return [
                     Object.assign({},exist,action.payload),
-                    ...state.filter(item=>(item.propertyId !== action.payload.propertyId))
+                    ...state.filter(item=>(item.property !== action.payload.property))
                 ];
             }
             else{
@@ -416,6 +479,8 @@ export const newProductProperty = (state=[],action)=>{
             
         case C.CLEAN_NEW_PRODUCT_PROPERTY:
             return [];
+        case C.LOAD_PRODUCTPROPERTIES:
+            return action.payload;
         default:
             return state;
     }
@@ -440,6 +505,8 @@ export const orderFactors= (state=[],action)=>{
                 console.log('orderFactor Info undefined'); // WHY ?
                 return state;
             }
+        case C.LOAD_ORDERFACTORS:
+            return action.payload;
         default:
             return state;
     }
@@ -452,6 +519,8 @@ export const orders= (state=[],action)=>{
                 ...state,
                 ...newOrders
             ];
+        case C.LOAD_ORDERS:
+            return action.payload;
         default:
             return state;
     }
@@ -473,6 +542,8 @@ const expenses = (state=[],action)=>{
                     create_date_time:date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
                 }                
             ]
+        case C.LOAD_EXPENSES:
+            return action.payload;
         default:
             return state;
     }
@@ -482,10 +553,7 @@ export const newExpense = (state={},action)=>{
         case C.CHANGE_NEW_EXPENSE:
             return Object.assign({},state,action.payload);
         case C.CLEAN_NEW_EXPENSE:
-            return {
-                title:null,
-                price:null
-            }
+            return {};
         default:
             return state;
     }
@@ -502,10 +570,9 @@ const newOrderFactor = (state={},action)=>{
         case C.CLEAR_NEW_ORDER_FACTOR:
             const date = new Date();
             return {
-                "code":action.payload.code,
                 "count":0,
                 "sum":0,
-                "create_date_time":date.getDate()+'/'+date.getMonth()+1+'/'+date.getFullYear()
+                "create_date_time":date.getDay()+'-'+date.getMonth()+1+'-'+date.getFullYear()
             }
         default:
             return state;
@@ -516,14 +583,13 @@ const newOrders = (state = [],action)=>{
         case C.ADD_NEW_ORDER:
             const newOrder= action.payload;
             let count = 0;
-            
             const exist = state.find(order=>
-                order.productCode == newOrder.productCode);
+                order.code == newOrder.code);
             
             if (exist){
                 count = exist.count +1;
                 return [
-                    ...state.filter(order=> order.productCode != newOrder.productCode),
+                    ...state.filter(order=> order.code != newOrder.code),
                     Object.assign({},exist,{count:count})
                 ]
             }
@@ -544,8 +610,12 @@ const newOrders = (state = [],action)=>{
     }
 }
 export default combineReducers({
-    navigate,
+    navigation,
     waitForResponse,
+    loadingCategories,
+    loadingSubCategories,
+    loadingFactors,
+    loadingProperties,
     userInfo,
     error,
     newCategory,

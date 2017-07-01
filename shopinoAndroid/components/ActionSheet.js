@@ -4,7 +4,7 @@ import {Button,Icon} from 'native-base'
 import {connect} from 'react-redux'
 import {Text,Field} from './common'
 import {colors} from './styles'
-import {changeSearch} from '../actions'
+import {changeSearch,loadProducts} from '../actions'
 
 const styles={
     container:{
@@ -47,7 +47,7 @@ class MyActionSheet extends Component{
         
     }
     render(){        
-        const {visible,title,label,icon,children,setVisible,changeSearchInfo} = this.props;        
+        const {visible,title,label,load,icon,children,setVisible,changeSearchInfo} = this.props;        
         const fade = ()=>{
             setVisible(false); //TODO: find a way to do it internally
         };
@@ -70,13 +70,15 @@ class MyActionSheet extends Component{
                                 }
                                 <View style={{flex:1}}>
                                     <Field
-                                        icon={icon}
+                                        icon="search"
                                         label={label}
                                         input
-                                        onChange={(event)=>changeSearchInfo('name',event.nativeEvent.text)}/>
+                                        onChange={(event)=>{
+                                            changeSearchInfo('name',event.nativeEvent.text);
+                                            load();
+                                        }}/>
                                 </View>
-                            </View>                            
-
+                            </View>
                         </View>
                     </TouchableHighlight>
                 </View>
@@ -92,6 +94,9 @@ const mapDispatchTopProps = (dispatch,ownProps) =>({
         info[field] = value;
         console.log(info);
         dispatch(changeSearch(info));
+    },
+    load:()=>{
+        dispatch(loadProducts());
     }
 })
 

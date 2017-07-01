@@ -33,7 +33,7 @@ const App = StackNavigator({
     Users:{screen:Users},
     CreateUser:{screen:CreateUser}
 },{
-    initialRouteName:'Users',
+    initialRouteName:'Login',
     initialRouteParams:{
         title:'فاکتورهای فروش',
         ExpenseModalVisible:false

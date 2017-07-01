@@ -1,33 +1,38 @@
 import React,{Component} from 'react'
 import {View,Button,Icon} from 'native-base'
 import {connect} from 'react-redux'
-import {Card,Text,Field} from '../common'
+import {Card,Text,Field,SimpleLoad} from '../common'
 import {colors} from '../styles'
 import Tab from './Tab'
-import {addProperty,changeNewProperty,addNewProductProperty} from '../../actions'
+import {addProperty,changeNewProperty,addNewProductProperty,loadProperties} from '../../actions'
 
 class Properties extends Component{
     static navigationOptions={
         tabBarLabel:()=><Text white small> ویژگی ها</Text>
     }
     render(){
-        const {properties,error,changeProperty,createProperty,addProductProperty,edit,editCode} = this.props;
-
+        const {wait,
+            loadingProperties,
+            properties,error,changeProperty,createProperty,addProductProperty,edit,editCode} 
+        = this.props;
         const propertyItems = properties.map((item,index)=>{
-            const temp = edit.find(element=> element.propertyId == item.id);
+            const temp = edit.find(element=> element.property == item.id);
+            console.log('temp:',temp);
             return(
             <Field
                 key={index}
                 icon="arrow-dropleft"
-                input
                 value={temp?temp.value:null}
                 label={item.name}
                 onChange={(event)=>{
-                    addProductProperty({
-                        productCode: editCode,
-                        propertyId: item.id,
+                    let info = {
+                        property: item.id,
                         value:event.nativeEvent.text
-                    });
+                    }
+                    if(editCode){
+                        info.product = editCode;
+                    }
+                    addProductProperty(info);
                 }}
                 />
         )});
@@ -35,17 +40,18 @@ class Properties extends Component{
             <Tab>
                 <Card column>
                     <Field
+                        load={wait}
                         icon="link"
-                        input
-                        label="ویژگی جدید"
+                        placeholder="ویژگی جدید"
                         onChange={(event)=>changeProperty(event.nativeEvent.text)}
                         error={error.propertyName?error.propertyName:null}>
-
                         <Button transparent small style={{alignSelf:'center'}} onPress={()=>createProperty()}>
                             <Icon name="add-circle" style={{color:colors.accent}}/>
                         </Button>
                     </Field>
-                    {propertyItems}
+                    {loadingProperties?<SimpleLoad wait={true}/>:
+                        propertyItems
+                    }
                 </Card>
             </Tab>
         );
@@ -53,8 +59,10 @@ class Properties extends Component{
 }
 
 const mapStateToProps = (state,ownProps)=>({
+    wait:state.waitForResponse,
+    loadingProperties:state.loadingProperties,
     error:state.error,
-    properties: state.properties.filter((item)=>item.subCategoryId === state.selectedSubCategory),
+    properties: state.properties,
     edit:state.newProductProperty,
     editCode:state.newProduct.code
 });
@@ -67,6 +75,9 @@ const mapDispatchToProp = (dispatch,ownProps)=>({
     },
     addProductProperty:(productProperty)=>{
         dispatch(addNewProductProperty(productProperty));
-    }
+    }/*,
+    loadInfo:()=>{
+        dispatch(loadProperties());
+    }*/
 })
 export default connect(mapStateToProps,mapDispatchToProp)(Properties)

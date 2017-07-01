@@ -8,6 +8,8 @@ import Modal from './Modal'
 import ErrorMessage from './ErrorMessage'
 import CardRow from './CardRow'
 import Field from './Field'
+import Load from './Load'
+import SimpleLoad from './SimpleLoad'
 
 module.exports= {
     ErrorMessage,
@@ -19,5 +21,7 @@ module.exports= {
     CardItem,
     Row,
     Modal,
-    CardRow
+    CardRow,
+    Load,
+    SimpleLoad
 }

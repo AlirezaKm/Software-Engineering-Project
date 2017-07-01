@@ -1,22 +1,19 @@
 import C from './constants'
-import { NavigationActions } from 'react-navigation'
-const navigateAction = NavigationActions.navigate({
+import {get,post,put,del} from '../api'
+import urls from '../api/tables'
+import {sendMessage} from './helper'
+/*const navigateAction = NavigationActions.navigate({
   routeName: 'Profile'
-});
+});*/
 
 
 export const setNavigate = (navigate) =>({
     type:C.SET_NAVIGATE,
     payload:navigate
-})
-
-const sendRequest = (dispatch)=> 
-    dispatch({
-        type:C.SEND_AUTH_REQUEST
-    });
+});
 
 export const login = (username,password)=> (dispatch,getState)=> {
-    sendRequest(dispatch);
+    //sendRequest(dispatch);
     dispatch({
         type:C.CHANGE_USER_INFO,
         payload:{
@@ -49,7 +46,7 @@ export const login = (username,password)=> (dispatch,getState)=> {
         else{
             dispatch(createError('اطلاعات وارد شده صحیح نمی باشد'));
         }*/
-        getState().navigate('HomePage');
+        getState().navigation.navigate('HomePage');
     },
     1000);
 }
@@ -62,15 +59,12 @@ export const createError = (field,message)=>{
         payload:error
     }
 };
+export const cleanError = (field)=>
+    createError(field,null);
 
-export const cleanError = (field)=>{
-    let error={};
-    error[field] = null;
-    return {
-        type:C.CHANGE_ERROR,
-        payload:error
-    }
-};
+export const cleanAllError = ()=>({
+    type:C.CLEAN_ERROR
+})
 
 export const createMessage = (field,message)=>{
     let msg={};
@@ -80,24 +74,114 @@ export const createMessage = (field,message)=>{
         payload:msg
     }
 };
-
 export const cleanMessage = (field)=>{
     return createMessage(field,null);
 };
 
+//   ------------------ factors ------------------
+export const loadFactors = (page=1)=>(dispatch)=>{
+    dispatch({
+        type:C.SEND_REQUEST_FACTORS
+    })
+    const parameters = "?page="+page;
+    get(urls.factors,dispatch,()=>{
+        dispatch({
+            type:C.RECEIVE_RESPONE_FACTORS
+        })
+    },parameters);
+}
+
+export const addFactor = () =>(dispatch,getState) =>{
+    const newFactor = getState().newFactor;
+    console.log('addFactor:newFactor:',newFactor);
+    if(checkFactorInfo(newFactor,dispatch,true)){
+        newFactor.seller = 1;
+        post(urls.factors,newFactor,dispatch,(err,data)=>{
+            console.log('addFactor:callback:',data);
+            dispatch(loadFactors());
+            sendMessage('factors','فاکتور ایجاد شد',dispatch);
+        })
+    }
+};
+
+export const changeNewFactor = (factorInfo)=> (dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_FACTOR,
+        payload:{
+            ...factorInfo
+        }
+    });
+    checkFactorInfo(getState().newFactor,dispatch);
+}
+
+
+const checkFactorInfo = (info,dispatch,final = false)=>{
+    let success = true;
+    const {
+        seller,
+        date
+    } = info;
+
+    if(seller){
+        if(seller.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
+        }
+        else{
+            dispatch(cleanError('seller'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
+    }
+    
+    if(date){
+        if(date.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('date','تاریخ انتخاب نشده است'));    
+        }
+        else{
+            dispatch(cleanError('date'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('date','تاریخ انتخاب نشده است')); 
+    }
+
+    return success;
+}
+
+export const changeSelectedFactor = (factorId)=>({
+    type:C.CHANGE_SELECTED_FACTOR,
+    payload:factorId
+ });
+
+export const cleanNewFactor=()=>({
+    type:C.CLEAN_NEW_FACTOR
+})
+
+//   ------------------ categories ------------------
+export const loadCategories = ()=>(dispatch,getState)=>{
+    dispatch({
+        type:C.SEND_REQUEST_CATEGORIES
+    })
+    get(urls.categories,dispatch,()=>{
+        console.log('categories loaded');
+        dispatch({
+            type:C.RECEIVE_RESPONE_CATEGORIES
+        });
+    });
+}
 export const addCategory = ()=>(dispatch,getState) =>{
-    if(checkCategoryInfo(getState().newCategory,dispatch,true)){
-        dispatch({
-            type:C.ADD_CATEGORY,
-            payload:getState().newCategory
-        })
-        dispatch(createMessage('category','دسته ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_CATEGORY,
-            payload:{
-                id:getState().categories[getState().categories.length-1].id
-            }
-        })
+    const newCategory = getState().newCategory;
+    if(checkCategoryInfo(newCategory,dispatch,true)){
+        post(urls.categories,newCategory,dispatch,()=>{
+            sendMessage('category','دسته ایجاد شد',dispatch);
+            dispatch(loadCategories());
+        });
+        
     }
 };
 
@@ -108,28 +192,81 @@ export const editCategory = (id,name)=>({
         name:name
     }
 });
+export const changeSelectedCategory = (categoryId)=>(dispatch)=>{
+    dispatch(loadSubCategories(categoryId));
+    dispatch(changeSelectedSubCategory(-1));
+    dispatch({
+        type:C.CHANGE_SELECTED_CATEGORY,
+        payload:categoryId
+    });
 
-export const addSubCategory = ()=>(dispatch,getState) =>{
-    if(checkSubCategoryInfo(getState().newSubCategory,dispatch,true)){
-        const selectedCategory = getState().selectedCategory;
-        dispatch({
-            type:C.ADD_SUB_CATEGORY,
-            payload:{
-                categoryId:selectedCategory,
-                ...getState().newSubCategory
-            }
-        })
-        dispatch(createMessage('subCategory','زیر دسته ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_SUB_CATEGORY,
-            payload:{
-                id:getState().subCategories[getState().subCategories.length-1].id,
-                categoryId:selectedCategory
-            }
-        })
-    }
 };
 
+export const changeNewCategory = (categoryInfo)=> (dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_CATEGORY,
+        payload:{
+            ...categoryInfo
+        }
+    });
+    checkCategoryInfo(getState().newCategory,dispatch);
+}
+
+const checkCategoryInfo = (info,dispatch,final = false)=>{
+    let success = true;
+    const {
+        name,        
+    } = info;
+
+    if(name){
+        if(name.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));    
+        }
+        else{
+            dispatch(cleanError('categoryName'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));  
+    }
+
+    return success;  
+}
+
+export const cleanNewCatgory = ()=>({
+    type:C.CLEAN_NEW_CATEGORY
+});
+
+
+//   ------------------- subcategories -------------------
+export const loadSubCategories = (categoryId)=>(dispatch)=>{
+    dispatch({
+        type:C.SEND_REQUEST_SUBCATEGORIES
+    });
+    const url = urls.subcategories;
+    const parameters = "?category="+categoryId;
+    get(url,dispatch,()=>{
+        dispatch({
+            type:C.RECEIVE_RESPONE_SUBCATEGORIES
+        })
+    },parameters);
+}
+
+export const addSubCategory = ()=>(dispatch,getState) =>{
+    const newSubCategory = getState().newSubCategory;
+    if(checkSubCategoryInfo(newSubCategory,dispatch,true)){
+        const selectedCategory = getState().selectedCategory;
+        post(urls.subcategories,{
+            category:selectedCategory,
+            ...getState().newSubCategory
+        },dispatch,()=>{
+            dispatch(loadSubCategories(selectedCategory));
+            sendMessage('subCategory','زیر دسته ایجاد شد',dispatch);
+        });
+    }
+};
 export const editSubCategory = (id,categoryId,name)=>({
     type:C.EDIT_SUB_CATEGORY,
     payload:{
@@ -138,112 +275,127 @@ export const editSubCategory = (id,categoryId,name)=>({
         name:name
     }
 });
+export const changeSelectedSubCategory = (subCategoryId)=>(dispatch,getState)=>{
+    if(subCategoryId >= 1){
+        dispatch(loadProperties(subCategoryId));
+        checkPropertyInfo(getState().newProperty,dispatch);
+    }
+    dispatch({
+        type:C.CHANGE_SELECTED_SUB_CATEGORY,
+        payload:subCategoryId
+    });
+};
 
-export const changeSelectedCategory = (categoryId)=>({
-    type:C.CHANGE_SELECTED_CATEGORY,
-    payload:categoryId
+export const changeNewSubCategory = (subCategoryInfo)=> (dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_SUB_CATEGORY,
+        payload:{
+            ...subCategoryInfo
+        }
+    });
+    checkSubCategoryInfo(getState().newSubCategory,dispatch);
+}
+
+const checkSubCategoryInfo = (info,dispatch,final = false)=>{
+    let success = true;
+    const {
+        name,        
+    } = info;
+
+    if(name){
+        if(name.replace(" ","").length == 0){
+            success = false;
+            dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));    
+        }
+        else{
+            dispatch(cleanError('subCategoryName'));
+        }
+    }
+    else if(final){
+        success = false;
+        dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));  
+    }
+
+    return success;  
+}
+
+export const cleanNewSubCategory = ()=>({
+    type:C.CLEAN_NEW_SUB_CATEGORY
 });
 
-export const changeSelectedSubCategory = (subCategoryId)=>({
-    type:C.CHANGE_SELECTED_SUB_CATEGORY,
-    payload:subCategoryId
-});
-
+//  OrderFactors
 export const changeSelectedOrderFactor = (orderFactorId)=>({
     type:C.CHANGE_SELECTED_ORDER_FACTOR,
     payload:orderFactorId
  });
 
-export const changeSelectedFactor = (factorId)=>({
-    type:C.CHANGE_SELECTED_FACTOR,
-    payload:factorId
- });
-
+export const loadOrderFactors = ()=>(dispatch)=>{
+     get(urls.orderFactors,dispatch);
+ }
+export const loadOrders = (orderFactorId)=>(dispatch)=>{
+    get(urls.orders,dispatch,null,"?orderFactor="+orderFactorId);
+}
 export const changeSelectedProduct = (productCode)=>(dispatch,getState)=>{
     dispatch({
         type:C.CHANGE_SELECTED_PRODUCT,
         payload:productCode
     });
-    const info ={
-        code:productCode,
-        ...getState().products.find((item)=> item.code === productCode)
-    }
-    console.log('newProduct Info',info);
+    get(urls.productProperties,dispatch,null,"?product="+productCode);
+
+    let product = getState().products.find((item)=> item.code === productCode);
+    
     dispatch({
         type:C.CHANGE_NEW_PRODUCT,
-        payload:info
-    });
-    getState().productProperty.forEach(item=>{
-        if(item.productCode == productCode){
-            console.log('add new Product property for selected product');
-            dispatch(addNewProductProperty({
-                productCode:productCode,
-                propertyId:item.propertyId,
-                value:item.value
-            }));      
-        }
+        payload:product
     });
 };
 
+export const loadProducts = (page,factorId)=>(dispatch,getState)=>{
+    const searchInfo =getState().search;
+    let params='';
+    if(factorId || searchInfo.name){
+        params+='?';
+        params+=factorId?'factor='+factorId:'';
+        if(params.length!=1){
+            params+='&';
+        }
+        params+=searchInfo.name?'name='+searchInfo.name:'';
+    }
+    console.log('loadProducts:params: ',params);
+    get(urls.products,dispatch,null,params);
+}
 
 export const addProduct = () =>(dispatch,getState) =>{
-    console.log('add Product');
-    const newProduct = getState().newProduct;
+    let newProduct = getState().newProduct;
     if(checkProductInfo(newProduct,dispatch,true)){
-        
-        console.log('add Product: passed');
-
-        if(newProduct.code){
-            console.log('edit Product: on');
-            dispatch({
-                type:C.EDIT_PRODUCT,
-                payload:newProduct
-            });
-
-            dispatch({
-                type:C.EDIT_PRODUCT_PROPERTY,
-                payload:getState().newProductProperty
-            });            
+        newProduct = {
+            ...newProduct,
+            productProperties:JSON.stringify(getState().newProductProperty)
         }
-        else{
-            dispatch({
-                type:C.ADD_PRODUCT,
-                payload:newProduct
-            });
-
-            const productCode = getState().products[getState().products.length-1].code;
-
-            dispatch({
-                type:C.CHANGE_NEW_PRODUCT,
-                payload:{
-                    code:productCode
-                }
-            });
-
-            dispatch({
-                type:C.ADD_PRODUCT_PROPERTY,
-                payload:getState().newProductProperty.map(item=>{
-                    if(item.value){
-                        return{
-                        productCode:productCode,
-                        ...item
-                        }
-                    }
-                })
+        if(newProduct.code){//edit 
+            put(urls.products,newProduct.code,newProduct,dispatch,()=>{
+                dispatch(loadProducts());
+                sendMessage('products','محصول ویرایش شد',dispatch);
+            })
+        }
+        else{//add New
+            post(urls.products,newProduct,dispatch,(err,data)=>{
+                console.log('post:data:',data);
+                dispatch(loadProducts());
+                sendMessage('products','محصول ایجاد شد',dispatch);
             });
         }
-        console.log('add Product: dispatch');
-        dispatch(createMessage('product','محصول ایجاد شد'));
     }
 };
 
-export const deleteProduct = (productCode)=>({
-    type:C.REMOVE_PRODUCT,
-    payload:productCode
-});
+export const deleteProduct = (productCode)=>(dispatch)=>{
+    del(urls.products,productCode,dispatch,(err,data)=>{
+        dispatch(loadProducts());
+        sendMessage('products','محصول حذف شد',dispatch);
+    })
+};
 
 export const cleanNewProduct = ()=>(dispatch,getState)=>{
-    console.log('cleanNewProducr:start: newProduct: ',getState().newProduct);
     dispatch({
         type:C.CLEAN_NEW_PRODUCT,
         payload:{}
@@ -263,8 +415,6 @@ export const cleanNewProduct = ()=>(dispatch,getState)=>{
     dispatch({
         type:C.CLEAN_NEW_PRODUCT_PROPERTY
     });
-
-    setTimeout(()=>console.log('cleanNewProducr:end: newProduct: ',getState().newProduct),3000);
 }
 
 export const changeNewProduct = (productInfo) => (dispatch,getState)=>{
@@ -289,9 +439,9 @@ const checkProductInfo = (info,dispatch, final = false)=>{
     }
     const {
         name,
-        factorId,
-        categoryId,
-        subCategoryId,
+        factor,
+        category,
+        subcategory,
         count,
         buyPrice,
         sellPrice
@@ -310,8 +460,8 @@ const checkProductInfo = (info,dispatch, final = false)=>{
         err('name','نام نمی تواند خالی باشد');    
     }
 
-    if(factorId){
-        if(factorId < 0){
+    if(factor){
+        if(factor < 0){
             err('factorId','فاکتور باید انتخاب شود');    
         }
         else{
@@ -322,8 +472,8 @@ const checkProductInfo = (info,dispatch, final = false)=>{
         err('factorId','فاکتور باید انتخاب شود');    
     }
 
-    if(categoryId){
-        if(categoryId < 0){            
+    if(category){
+        if(category < 0){            
             err('categoryId','دسته باید انتخاب شود');    
         }
         else{
@@ -334,8 +484,8 @@ const checkProductInfo = (info,dispatch, final = false)=>{
         err('categoryId','دسته باید انتخاب شود');    
     }
 
-    if(subCategoryId){
-        if(subCategoryId < 0){
+    if(subcategory){
+        if(subcategory < 0){
             err('subCategoryId','زیر دسته باید انتخاب شود');    
         }
         else{
@@ -388,180 +538,60 @@ const checkProductInfo = (info,dispatch, final = false)=>{
     return success;
 }
 
-export const addFactor = () =>(dispatch,getState) =>{
-    if(checkFactorInfo(getState().newFactor,dispatch,true)){
-        dispatch({
-            type:C.ADD_FACTOR,
-            payload:getState().newFactor
-        })
-        dispatch(createMessage('factor','فاکتور ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_FACTOR,
-            payload:{
-                id:getState().factors[getState().factors.length-1].id
-            }
-        })
-    }
-};
 
-export const changeNewCategory = (categoryInfo)=> (dispatch,getState)=>{
+
+export const loadProperties = (subCategoryId)=>(dispatch)=>{
     dispatch({
-        type:C.CHANGE_NEW_CATEGORY,
-        payload:{
-            ...categoryInfo
-        }
+        type:C.SEND_REQUEST_PROPERTY
     });
-    checkCategoryInfo(getState().newCategory,dispatch);
-}
-
-const checkCategoryInfo = (info,dispatch,final = false)=>{
-    let success = true;
-    const {
-        name,        
-    } = info;
-
-    if(name){
-        if(name.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));    
-        }
-        else{
-            dispatch(cleanError('categoryName'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('categoryName','نام دسته نمی تواند خالی باشد'));  
-    }
-
-    return success;  
-}
-
-export const changeNewSubCategory = (subCategoryInfo)=> (dispatch,getState)=>{
-    dispatch({
-        type:C.CHANGE_NEW_SUB_CATEGORY,
-        payload:{
-            ...subCategoryInfo
-        }
-    });
-    checkSubCategoryInfo(getState().newSubCategory,dispatch);
-}
-
-const checkSubCategoryInfo = (info,dispatch,final = false)=>{
-    let success = true;
-    const {
-        name,        
-    } = info;
-
-    if(name){
-        if(name.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));    
-        }
-        else{
-            dispatch(cleanError('subCategoryName'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('subCategoryName','نام زیر دسته نمی تواند خالی باشد'));  
-    }
-
-    return success;  
-}
-
-export const changeNewFactor = (factorInfo)=> (dispatch,getState)=>{
-    dispatch({
-        type:C.CHANGE_NEW_FACTOR,
-        payload:{
-            ...factorInfo
-        }
-    });
-    checkFactorInfo(getState().newFactor,dispatch);
-}
-
-
-
-const checkFactorInfo = (info,dispatch,final = false)=>{
-    let success = true;
-    const {
-        seller,
-        date
-    } = info;
-
-    if(seller){
-        if(seller.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
-        }
-        else{
-            dispatch(cleanError('seller'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('seller','فروشنده نمی تواند خالی باشد'));    
-    }
+    const url = urls.properties;
     
-    if(date){
-        if(seller.replace(" ","").length == 0){
-            success = false;
-            dispatch(createError('date','تاریخ انتخاب نشده است'));    
-        }
-        else{
-            dispatch(cleanError('date'));
-        }
-    }
-    else if(final){
-        success = false;
-        dispatch(createError('date','تاریخ انتخاب نشده است')); 
-    }
+    const parameters = "?subCategory="+subCategoryId;
 
-    return success;
+    console.log('loadProperties:url:',url,parameters);
+    get(url,dispatch,()=>{
+        dispatch({
+            type:C.RECEIVE_RESPONE_PROPERTY
+        })
+    },parameters);
 }
 
 export const addProperty = () =>(dispatch,getState) =>{
-    console.log('addProperty:start');
-    console.log('selected Sub Category: ',getState().selectedSubCategory);
-    console.log(getState().properties.length);
-    if(checkPropertyInfo(getState().newProperty,dispatch)){
-        console.log('addProperty:passed');
-        const newProp = {
-            subCategoryId:getState().selectedSubCategory,
-            ...getState().newProperty
-        }
-        dispatch({
-            type:C.ADD_PROPERTY,
-            payload:newProp
-        })
-        console.log('addProperty:added:');
-        console.log(newProp.name);
-        console.log(newProp.subCategoryId);
-
-        dispatch(createMessage('property','ویژگی ایجاد شد'));
-        dispatch({
-            type:C.CHANGE_NEW_PROPERTY,
-            payload:{
-                id:getState().properties[getState().properties.length-1].id
-            }
-        })
+    const selectedSubCategory = getState().selectedSubCategory;
+    const newProperty={
+        ...getState().newProperty,
+        subcategory:selectedSubCategory
+    }
+    if(checkPropertyInfo(newProperty,dispatch,true)){
+        post(urls.properties,newProperty,dispatch,()=>{
+            dispatch(loadProperties(selectedSubCategory));
+            sendMessage('property','ویژگی ایجاد شد',dispatch);
+        });
     }
 };
 
-export const changeNewProperty = (propertyInfo)=>({
-    type:C.CHANGE_NEW_PROPERTY,
-    payload:{
-        ...propertyInfo
-    }
-})
+export const changeNewProperty = (propertyInfo)=>(dispatch,getState)=>{
+    dispatch({
+        type:C.CHANGE_NEW_PROPERTY,
+        payload:{
+            ...propertyInfo
+        }
+    });
+    checkPropertyInfo(getState().newProperty,dispatch);
+};
 
-const checkPropertyInfo = (info,dispatch)=>{
+const checkPropertyInfo = (info,dispatch,final=false)=>{
     let success = true;
     const {
-        name
+        name,
+        subCategoryId
     } = info;
     //console.log('propertyName: ',name);
-    if(name){
+    if(final && subCategoryId<1){
+        success = false;
+        dispatch(createError('propertyName','زیر دسته انتخاب نشده است'));    
+    }
+    else if(name){
         if(name.replace(" ","").length == 0){
             success = false;
             dispatch(createError('propertyName','نام ویژگی نمی تواند خالی باشد'));    
@@ -570,9 +600,12 @@ const checkPropertyInfo = (info,dispatch)=>{
             dispatch(cleanError('propertyName'));
         }
     }
-    else{
+    else if(final){
         success = false;
         dispatch(createError('propertyName','نام ویژگی نمی تواند خالی باشد'));  
+    }
+    else{
+        dispatch(cleanError('propertyName'));
     }
 
     return success;  
