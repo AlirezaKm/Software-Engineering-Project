@@ -115,11 +115,12 @@ class OrderFactorAPIController extends AppBaseController
      */
     public function store(CreateOrderFactorAPIRequest $request)
     {
-        $OrderFactorInfo = $request->except('orders');
+        $OrderFactorInfo = $request->except(['orders','create_date_time']);
         $orderFactor = $this->orderFactorRepository->create($OrderFactorInfo);
         if(empty($orderFactor)){
             return $this->sendError('OrderFactor Not Created!');
         }
+
         if($request->has('orders')){
             $orders = $request->only('orders');
             if(is_string($orders['orders'])){
@@ -136,7 +137,7 @@ class OrderFactorAPIController extends AppBaseController
             // Here insert Order
             DB::table('Order')->insert($pp);
         }
-        if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور سفارش به شماره %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$orderFactor->id),$request);}
+        //if(LOG::$log_is_on) {LOG::infoReq(sprintf("کاربر %s فاکتور سفارش به شماره %s را ثبت کرده است.",$request->user()->fname." ".$request->user()->lname,$orderFactor->id),$request);}
         return $this->sendResponse($request->all(), 'Order Factor saved successfully');
     }
 

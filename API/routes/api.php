@@ -20,33 +20,43 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 # Authentication
 Route::post('login','AuthController@login');
 
-# This Function Available From In Site (Just Loggedin User), This Mean Just Admin Can Registered a user (Admin , Stockman , Accountant , Seller)
-Route::post('register','AuthController@register');
+Route::middleware(['auth:api'])->group(function (){
 
+# This Function Available From In Site (Just Loggedin User), This Mean Just Admin Can Registered a user (Admin , Stockman , Accountant , Seller)
+    Route::post('register','AuthController@register');
+ /*
+ * scope : stockman , admin , accountant , seller
+ * Route::middleware(['auth:api','scope:'])->group(function(){
+ *
+ * });
+ */
 //Route::resource('user_types', 'API\UserTypeAPIController');
 
-Route::resource('users', 'API\UserAPIController', ['except' => [
-    'store', 'update','create','destroy'
-]]);
+    Route::resource('users', 'API\UserAPIController');
 
-Route::resource('products', 'API\ProductAPIController');
+    Route::resource('products', 'API\ProductAPIController');
 
-Route::resource('categories', 'API\CategoryAPIController');
+    Route::resource('categories', 'API\CategoryAPIController');
 
-Route::resource('subcategories', 'API\SubCategoryAPIController');
+    Route::resource('subcategories', 'API\SubCategoryAPIController');
 
-Route::resource('properties', 'API\PropertyAPIController');
+    Route::resource('properties', 'API\PropertyAPIController');
 
-Route::resource('productproperties', 'API\ProductPropertyAPIController');
+    Route::resource('productproperties', 'API\ProductPropertyAPIController');
 
-Route::resource('expenses', 'API\ExpenseAPIController');
+    Route::resource('expenses', 'API\ExpenseAPIController');
 
-Route::resource('factors', 'API\FactorsAPIController');
+    Route::resource('factors', 'API\FactorsAPIController');
 
-Route::resource('orders', 'API\OrderAPIController');
+    Route::resource('orders', 'API\OrderAPIController');
 
-Route::resource('order_statuses', 'API\OrderStatusAPIController');
+    Route::resource('order_statuses', 'API\OrderStatusAPIController');
 
-Route::resource('sellers', 'API\SellersAPIController');
+    Route::resource('sellers', 'API\SellersAPIController');
 
-Route::resource('orderfactors', 'API\OrderFactorAPIController');
+    Route::resource('orderfactors', 'API\OrderFactorAPIController');
+
+    Route::resource('logs', 'API\LOGAPIController',['except' => [
+        'store', 'update','create','destroy','edit'
+    ]]);
+});

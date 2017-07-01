@@ -1,7 +1,7 @@
 <IfModule mod_rewrite.c>
     <IfModule mod_headers.c>
         Header set Access-Control-Allow-Origin "*"
-        Header set Access-Control-Allow-Headers "origin, x-requested-with, content-type"
+        Header set Access-Control-Allow-Headers "Authorization ,origin, x-requested-with, content-type"
         Header set Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"
     </IfModule>
     <IfModule mod_negotiation.c>

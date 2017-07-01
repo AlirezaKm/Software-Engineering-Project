@@ -49,10 +49,11 @@ class AuthController extends Controller
             $token = $user->createToken($user->fname . " " . $user->lname . " Token", [UserType::where('id',$user->type)->first()->name]);
 
             return Response::json(ResponseUtil::makeResponse(Farsi::$USER_LOGGED_IN, [
-                'client_id' => $client->id,
-                'secret' => $client->secret,
+                //'client_id' => $client->id,
+                //'secret' => $client->secret,
                 'access_token' => $token->accessToken,
-                'redirect' => "/"
+                //'redirect' => "/"
+                'type' => $user->userType->name
             ]));
         }
     }

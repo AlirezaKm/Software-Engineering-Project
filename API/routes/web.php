@@ -11,7 +11,7 @@
 |
 */
 
-
+/*
 Route::get('/redirect', function () {
     $http = new GuzzleHttp\Client;
 
@@ -59,3 +59,13 @@ Route::resource('orderStatuses', 'OrderStatusController');
 Route::resource('sellers', 'SellersController');
 
 Route::resource('orderFactors', 'OrderFactorController');
+
+Route::resource('lOGS', 'LOGController');
+*/
+use InfyOm\Generator\Utils\ResponseUtil;
+Route::get('/', function () {
+    return "HO OMADAM :|";//view('welcome');
+});
+Route::get('login', ['as' => 'login', 'uses' => function(){
+    return ResponseUtil::makeError("You Are Not Logged in !");
+}]);

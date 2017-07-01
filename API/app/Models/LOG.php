@@ -30,7 +30,7 @@ class LOG extends Model
     use SoftDeletes;
 
     public $table = 'logs';
-    public static $log_is_on = false;
+    public static $log_is_on = true;
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 

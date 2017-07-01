@@ -49,9 +49,7 @@ class OrderFactor extends Model
 
 
     public $fillable = [
-        'status',
-        'count',
-        'sum'
+        'status'
     ];
 
     /**
@@ -61,9 +59,7 @@ class OrderFactor extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'status' => 'integer',
-        'count' => 'integer',
-        'sum' => 'float'
+        'status' => 'integer'
     ];
 
     /**
@@ -72,9 +68,7 @@ class OrderFactor extends Model
      * @var array
      */
     public static $rules = [
-        'status' => 'required|numeric',
-        'count' => 'required|numeric',
-        'sum' => 'required|numeric'
+        'status' => 'numeric'
     ];
 
     /**
