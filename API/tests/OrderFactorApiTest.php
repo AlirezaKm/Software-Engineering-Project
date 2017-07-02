@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class OrderFactorApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class OrderFactorApiTest extends TestCase
     public function testCreateOrderFactor()
     {
         $orderFactor = $this->fakeOrderFactorData();
-        $this->json('POST', '/api/v1/orderFactors', $orderFactor);
+        $this->json('POST', '/api/orderFactors', $orderFactor);
 
         $this->assertApiResponse($orderFactor);
     }
@@ -24,7 +25,7 @@ class OrderFactorApiTest extends TestCase
     public function testReadOrderFactor()
     {
         $orderFactor = $this->makeOrderFactor();
-        $this->json('GET', '/api/v1/orderFactors/'.$orderFactor->id);
+        $this->json('GET', '/api/orderFactors/'.$orderFactor->id);
 
         $this->assertApiResponse($orderFactor->toArray());
     }
@@ -37,7 +38,7 @@ class OrderFactorApiTest extends TestCase
         $orderFactor = $this->makeOrderFactor();
         $editedOrderFactor = $this->fakeOrderFactorData();
 
-        $this->json('PUT', '/api/v1/orderFactors/'.$orderFactor->id, $editedOrderFactor);
+        $this->json('PUT', '/api/orderFactors/'.$orderFactor->id, $editedOrderFactor);
 
         $this->assertApiResponse($editedOrderFactor);
     }
@@ -48,10 +49,10 @@ class OrderFactorApiTest extends TestCase
     public function testDeleteOrderFactor()
     {
         $orderFactor = $this->makeOrderFactor();
-        $this->json('DELETE', '/api/v1/orderFactors/'.$orderFactor->id);
+        $this->json('DELETE', '/api/orderFactors/'.$orderFactor->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/orderFactors/'.$orderFactor->id);
+        $this->json('GET', '/api/orderFactors/'.$orderFactor->id);
 
         $this->assertResponseStatus(404);
     }

@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class OrderApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class OrderApiTest extends TestCase
     public function testCreateOrder()
     {
         $order = $this->fakeOrderData();
-        $this->json('POST', '/api/v1/orders', $order);
+        $this->json('POST', '/api/orders', $order);
 
         $this->assertApiResponse($order);
     }
@@ -24,7 +25,7 @@ class OrderApiTest extends TestCase
     public function testReadOrder()
     {
         $order = $this->makeOrder();
-        $this->json('GET', '/api/v1/orders/'.$order->id);
+        $this->json('GET', '/api/orders/'.$order->id);
 
         $this->assertApiResponse($order->toArray());
     }
@@ -37,7 +38,7 @@ class OrderApiTest extends TestCase
         $order = $this->makeOrder();
         $editedOrder = $this->fakeOrderData();
 
-        $this->json('PUT', '/api/v1/orders/'.$order->id, $editedOrder);
+        $this->json('PUT', '/api/orders/'.$order->id, $editedOrder);
 
         $this->assertApiResponse($editedOrder);
     }
@@ -48,10 +49,10 @@ class OrderApiTest extends TestCase
     public function testDeleteOrder()
     {
         $order = $this->makeOrder();
-        $this->json('DELETE', '/api/v1/orders/'.$order->id);
+        $this->json('DELETE', '/api/orders/'.$order->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/orders/'.$order->id);
+        $this->json('GET', '/api/orders/'.$order->id);
 
         $this->assertResponseStatus(404);
     }

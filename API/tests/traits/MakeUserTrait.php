@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeUserTrait
 {

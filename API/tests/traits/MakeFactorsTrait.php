@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\Factors;
 use App\Repositories\FactorsRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeFactorsTrait
 {

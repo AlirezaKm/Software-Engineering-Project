@@ -3,6 +3,8 @@
 use App\Models\Expense;
 use App\Repositories\ExpenseRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class ExpenseRepositoryTest extends TestCase
 {

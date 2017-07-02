@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ProductPropertyApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class ProductPropertyApiTest extends TestCase
     public function testCreateProductProperty()
     {
         $productProperty = $this->fakeProductPropertyData();
-        $this->json('POST', '/api/v1/productProperties', $productProperty);
+        $this->json('POST', '/api/productProperties', $productProperty);
 
         $this->assertApiResponse($productProperty);
     }
@@ -24,7 +25,7 @@ class ProductPropertyApiTest extends TestCase
     public function testReadProductProperty()
     {
         $productProperty = $this->makeProductProperty();
-        $this->json('GET', '/api/v1/productProperties/'.$productProperty->id);
+        $this->json('GET', '/api/productProperties/'.$productProperty->id);
 
         $this->assertApiResponse($productProperty->toArray());
     }
@@ -37,7 +38,7 @@ class ProductPropertyApiTest extends TestCase
         $productProperty = $this->makeProductProperty();
         $editedProductProperty = $this->fakeProductPropertyData();
 
-        $this->json('PUT', '/api/v1/productProperties/'.$productProperty->id, $editedProductProperty);
+        $this->json('PUT', '/api/productProperties/'.$productProperty->id, $editedProductProperty);
 
         $this->assertApiResponse($editedProductProperty);
     }
@@ -48,10 +49,10 @@ class ProductPropertyApiTest extends TestCase
     public function testDeleteProductProperty()
     {
         $productProperty = $this->makeProductProperty();
-        $this->json('DELETE', '/api/v1/productProperties/'.$productProperty->id);
+        $this->json('DELETE', '/api/productProperties/'.$productProperty->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/productProperties/'.$productProperty->id);
+        $this->json('GET', '/api/productProperties/'.$productProperty->id);
 
         $this->assertResponseStatus(404);
     }

@@ -3,6 +3,8 @@
 use App\Models\Factors;
 use App\Repositories\FactorsRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class FactorsRepositoryTest extends TestCase
 {

@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class SellersApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class SellersApiTest extends TestCase
     public function testCreateSellers()
     {
         $sellers = $this->fakeSellersData();
-        $this->json('POST', '/api/v1/sellers', $sellers);
+        $this->json('POST', '/api/sellers', $sellers);
 
         $this->assertApiResponse($sellers);
     }
@@ -24,7 +25,7 @@ class SellersApiTest extends TestCase
     public function testReadSellers()
     {
         $sellers = $this->makeSellers();
-        $this->json('GET', '/api/v1/sellers/'.$sellers->id);
+        $this->json('GET', '/api/sellers/'.$sellers->id);
 
         $this->assertApiResponse($sellers->toArray());
     }
@@ -37,7 +38,7 @@ class SellersApiTest extends TestCase
         $sellers = $this->makeSellers();
         $editedSellers = $this->fakeSellersData();
 
-        $this->json('PUT', '/api/v1/sellers/'.$sellers->id, $editedSellers);
+        $this->json('PUT', '/api/sellers/'.$sellers->id, $editedSellers);
 
         $this->assertApiResponse($editedSellers);
     }
@@ -48,10 +49,10 @@ class SellersApiTest extends TestCase
     public function testDeleteSellers()
     {
         $sellers = $this->makeSellers();
-        $this->json('DELETE', '/api/v1/sellers/'.$sellers->id);
+        $this->json('DELETE', '/api/sellers/'.$sellers->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/sellers/'.$sellers->id);
+        $this->json('GET', '/api/sellers/'.$sellers->id);
 
         $this->assertResponseStatus(404);
     }

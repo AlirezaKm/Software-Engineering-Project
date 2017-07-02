@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\LOG;
 use App\Repositories\LOGRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeLOGTrait
 {

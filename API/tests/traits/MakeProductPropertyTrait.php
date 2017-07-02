@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\ProductProperty;
 use App\Repositories\ProductPropertyRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeProductPropertyTrait
 {

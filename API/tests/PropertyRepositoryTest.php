@@ -3,6 +3,8 @@
 use App\Models\Property;
 use App\Repositories\PropertyRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class PropertyRepositoryTest extends TestCase
 {

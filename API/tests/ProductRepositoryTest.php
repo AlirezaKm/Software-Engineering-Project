@@ -3,6 +3,8 @@
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class ProductRepositoryTest extends TestCase
 {

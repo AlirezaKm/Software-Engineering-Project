@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\OrderStatus;
 use App\Repositories\OrderStatusRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeOrderStatusTrait
 {

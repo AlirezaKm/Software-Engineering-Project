@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ProductApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class ProductApiTest extends TestCase
     public function testCreateProduct()
     {
         $product = $this->fakeProductData();
-        $this->json('POST', '/api/v1/products', $product);
+        $this->json('POST', '/api/products', $product);
 
         $this->assertApiResponse($product);
     }
@@ -24,7 +25,7 @@ class ProductApiTest extends TestCase
     public function testReadProduct()
     {
         $product = $this->makeProduct();
-        $this->json('GET', '/api/v1/products/'.$product->id);
+        $this->json('GET', '/api/products/'.$product->id);
 
         $this->assertApiResponse($product->toArray());
     }
@@ -37,7 +38,7 @@ class ProductApiTest extends TestCase
         $product = $this->makeProduct();
         $editedProduct = $this->fakeProductData();
 
-        $this->json('PUT', '/api/v1/products/'.$product->id, $editedProduct);
+        $this->json('PUT', '/api/products/'.$product->id, $editedProduct);
 
         $this->assertApiResponse($editedProduct);
     }
@@ -48,10 +49,10 @@ class ProductApiTest extends TestCase
     public function testDeleteProduct()
     {
         $product = $this->makeProduct();
-        $this->json('DELETE', '/api/v1/products/'.$product->id);
+        $this->json('DELETE', '/api/products/'.$product->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/products/'.$product->id);
+        $this->json('GET', '/api/products/'.$product->id);
 
         $this->assertResponseStatus(404);
     }

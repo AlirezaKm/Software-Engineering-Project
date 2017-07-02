@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class CategoryApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class CategoryApiTest extends TestCase
     public function testCreateCategory()
     {
         $category = $this->fakeCategoryData();
-        $this->json('POST', '/api/v1/categories', $category);
+        $this->json('POST', '/api/categories', $category);
 
         $this->assertApiResponse($category);
     }
@@ -24,7 +25,7 @@ class CategoryApiTest extends TestCase
     public function testReadCategory()
     {
         $category = $this->makeCategory();
-        $this->json('GET', '/api/v1/categories/'.$category->id);
+        $this->json('GET', '/api/categories/'.$category->id);
 
         $this->assertApiResponse($category->toArray());
     }
@@ -37,7 +38,7 @@ class CategoryApiTest extends TestCase
         $category = $this->makeCategory();
         $editedCategory = $this->fakeCategoryData();
 
-        $this->json('PUT', '/api/v1/categories/'.$category->id, $editedCategory);
+        $this->json('PUT', '/api/categories/'.$category->id, $editedCategory);
 
         $this->assertApiResponse($editedCategory);
     }
@@ -48,10 +49,10 @@ class CategoryApiTest extends TestCase
     public function testDeleteCategory()
     {
         $category = $this->makeCategory();
-        $this->json('DELETE', '/api/v1/categories/'.$category->id);
+        $this->json('DELETE', '/api/categories/'.$category->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/categories/'.$category->id);
+        $this->json('GET', '/api/categories/'.$category->id);
 
         $this->assertResponseStatus(404);
     }

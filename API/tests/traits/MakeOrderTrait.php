@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\Order;
 use App\Repositories\OrderRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeOrderTrait
 {

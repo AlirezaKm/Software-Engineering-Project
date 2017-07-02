@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class SubCategoryApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class SubCategoryApiTest extends TestCase
     public function testCreateSubCategory()
     {
         $subCategory = $this->fakeSubCategoryData();
-        $this->json('POST', '/api/v1/subCategories', $subCategory);
+        $this->json('POST', '/api/subCategories', $subCategory);
 
         $this->assertApiResponse($subCategory);
     }
@@ -24,7 +25,7 @@ class SubCategoryApiTest extends TestCase
     public function testReadSubCategory()
     {
         $subCategory = $this->makeSubCategory();
-        $this->json('GET', '/api/v1/subCategories/'.$subCategory->id);
+        $this->json('GET', '/api/subCategories/'.$subCategory->id);
 
         $this->assertApiResponse($subCategory->toArray());
     }
@@ -37,7 +38,7 @@ class SubCategoryApiTest extends TestCase
         $subCategory = $this->makeSubCategory();
         $editedSubCategory = $this->fakeSubCategoryData();
 
-        $this->json('PUT', '/api/v1/subCategories/'.$subCategory->id, $editedSubCategory);
+        $this->json('PUT', '/api/subCategories/'.$subCategory->id, $editedSubCategory);
 
         $this->assertApiResponse($editedSubCategory);
     }
@@ -48,10 +49,10 @@ class SubCategoryApiTest extends TestCase
     public function testDeleteSubCategory()
     {
         $subCategory = $this->makeSubCategory();
-        $this->json('DELETE', '/api/v1/subCategories/'.$subCategory->id);
+        $this->json('DELETE', '/api/subCategories/'.$subCategory->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/subCategories/'.$subCategory->id);
+        $this->json('GET', '/api/subCategories/'.$subCategory->id);
 
         $this->assertResponseStatus(404);
     }

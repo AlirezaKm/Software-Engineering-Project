@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\OrderFactor;
 use App\Repositories\OrderFactorRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeOrderFactorTrait
 {

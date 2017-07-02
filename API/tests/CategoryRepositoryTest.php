@@ -3,6 +3,8 @@
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class CategoryRepositoryTest extends TestCase
 {

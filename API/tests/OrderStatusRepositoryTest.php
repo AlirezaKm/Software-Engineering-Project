@@ -3,6 +3,8 @@
 use App\Models\OrderStatus;
 use App\Repositories\OrderStatusRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class OrderStatusRepositoryTest extends TestCase
 {

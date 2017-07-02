@@ -64,7 +64,7 @@ Route::resource('lOGS', 'LOGController');
 */
 use InfyOm\Generator\Utils\ResponseUtil;
 Route::get('/', function () {
-    return "HO OMADAM :|";//view('welcome');
+    return view('index');
 });
 Route::get('login', ['as' => 'login', 'uses' => function(){
     return ResponseUtil::makeError("You Are Not Logged in !");

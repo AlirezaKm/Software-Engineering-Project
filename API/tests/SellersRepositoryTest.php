@@ -3,6 +3,8 @@
 use App\Models\Sellers;
 use App\Repositories\SellersRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class SellersRepositoryTest extends TestCase
 {

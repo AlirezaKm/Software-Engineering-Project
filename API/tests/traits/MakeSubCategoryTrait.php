@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\SubCategory;
 use App\Repositories\SubCategoryRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeSubCategoryTrait
 {

@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ExpenseApiTest extends TestCase
 {
@@ -13,7 +14,7 @@ class ExpenseApiTest extends TestCase
     public function testCreateExpense()
     {
         $expense = $this->fakeExpenseData();
-        $this->json('POST', '/api/v1/expenses', $expense);
+        $this->json('POST', '/api/expenses', $expense);
 
         $this->assertApiResponse($expense);
     }
@@ -24,7 +25,7 @@ class ExpenseApiTest extends TestCase
     public function testReadExpense()
     {
         $expense = $this->makeExpense();
-        $this->json('GET', '/api/v1/expenses/'.$expense->id);
+        $this->json('GET', '/api/expenses/'.$expense->id);
 
         $this->assertApiResponse($expense->toArray());
     }
@@ -37,7 +38,7 @@ class ExpenseApiTest extends TestCase
         $expense = $this->makeExpense();
         $editedExpense = $this->fakeExpenseData();
 
-        $this->json('PUT', '/api/v1/expenses/'.$expense->id, $editedExpense);
+        $this->json('PUT', '/api/expenses/'.$expense->id, $editedExpense);
 
         $this->assertApiResponse($editedExpense);
     }
@@ -48,10 +49,10 @@ class ExpenseApiTest extends TestCase
     public function testDeleteExpense()
     {
         $expense = $this->makeExpense();
-        $this->json('DELETE', '/api/v1/expenses/'.$expense->id);
+        $this->json('DELETE', '/api/expenses/'.$expense->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/v1/expenses/'.$expense->id);
+        $this->json('GET', '/api/expenses/'.$expense->id);
 
         $this->assertResponseStatus(404);
     }

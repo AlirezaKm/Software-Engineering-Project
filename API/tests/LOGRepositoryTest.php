@@ -3,6 +3,8 @@
 use App\Models\LOG;
 use App\Repositories\LOGRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class LOGRepositoryTest extends TestCase
 {

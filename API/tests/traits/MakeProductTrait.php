@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeProductTrait
 {

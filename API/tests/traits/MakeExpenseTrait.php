@@ -3,6 +3,7 @@
 use Faker\Factory as Faker;
 use App\Models\Expense;
 use App\Repositories\ExpenseRepository;
+use Illuminate\Support\Facades\App;
 
 trait MakeExpenseTrait
 {

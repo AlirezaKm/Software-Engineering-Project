@@ -3,6 +3,8 @@
 use App\Models\OrderFactor;
 use App\Repositories\OrderFactorRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
+use Tests\TestCase;
 
 class OrderFactorRepositoryTest extends TestCase
 {
