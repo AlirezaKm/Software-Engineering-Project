@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LOG;
 use App\Models\User;
 use App\Models\UserType;
 use Illuminate\Http\Request;
@@ -36,6 +37,7 @@ class AuthController extends Controller
             return Response::json(ResponseUtil::makeError(Farsi::$USER_NOT_FOUND));
         }else {
             $user = Auth::user();
+            LOG::infoReq(sprintf("کاربر %s توکن دریافت کرده است.", $user->fname." ".$user->lname), $req);
             $client = DB::table('oauth_clients')->where('user_id', $user->id)->first();
             if ($client === null) {
                 $client = (new ClientRepository)->createPersonalAccessClient(
@@ -79,7 +81,7 @@ class AuthController extends Controller
             'type'          => trim($req->input('type'))
         ]);
         $user->save();
-
+        LOG::infoReq(sprintf("کاربر %s در سیستم ثبت شد.", $user->fname." ".$user->lname), $req);
         // Get client_id & client_secret
         $client = (new ClientRepository)->createPersonalAccessClient(
             $user->id,
@@ -91,6 +93,7 @@ class AuthController extends Controller
     }
 
     function logout(Request $req){
+        LOG::infoReq(sprintf("کاربر %s از سیستم خارج شد.", $req->user()->fname." ".$req->user()->lname), $req);
         DB::table('oauth_access_tokens')->where('user_id', $req->user()->id)->where('revoked', 0)->update(['revoked' => 1]);
         return ResponseUtil::makeResponse(Farsi::$USER_LOGGED_OUT, []);
     }
