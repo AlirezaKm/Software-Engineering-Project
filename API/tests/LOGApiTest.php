@@ -14,7 +14,7 @@ class LOGApiTest extends TestCase
     public function testCreateLOG()
     {
         $lOG = $this->fakeLOGData();
-        $this->json('POST', '/api/lOGS', $lOG);
+        $this->json('POST', '/api/logs', $lOG);
 
         $this->assertApiResponse($lOG);
     }
@@ -25,7 +25,7 @@ class LOGApiTest extends TestCase
     public function testReadLOG()
     {
         $lOG = $this->makeLOG();
-        $this->json('GET', '/api/lOGS/'.$lOG->id);
+        $this->json('GET', '/api/logs/'.$lOG->id);
 
         $this->assertApiResponse($lOG->toArray());
     }
@@ -38,7 +38,7 @@ class LOGApiTest extends TestCase
         $lOG = $this->makeLOG();
         $editedLOG = $this->fakeLOGData();
 
-        $this->json('PUT', '/api/lOGS/'.$lOG->id, $editedLOG);
+        $this->json('PUT', '/api/logs/'.$lOG->id, $editedLOG);
 
         $this->assertApiResponse($editedLOG);
     }
@@ -49,10 +49,10 @@ class LOGApiTest extends TestCase
     public function testDeleteLOG()
     {
         $lOG = $this->makeLOG();
-        $this->json('DELETE', '/api/lOGS/'.$lOG->id);
+        $this->json('DELETE', '/api/logs/'.$lOG->id);
 
         $this->assertApiSuccess();
-        $this->json('GET', '/api/lOGS/'.$lOG->id);
+        $this->json('GET', '/api/logs/'.$lOG->id);
 
         $this->assertResponseStatus(404);
     }
